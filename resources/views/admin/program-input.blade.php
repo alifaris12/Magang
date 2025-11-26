@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Input Program Penelitian</title>
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg,#f7c842 0%,#f4a742 50%,#e8941a 100%);
+            min-height:100vh; padding:20px; line-height:1.6;
+        }
+        .container { max-width:800px; margin:0 auto; background:rgba(255,255,255,.95);
+            backdrop-filter:blur(10px); border-radius:20px; padding:60px 40px 40px 40px;
+            box-shadow:0 20px 40px rgba(255,140,0,.2), 0 10px 20px rgba(0,0,0,.1), inset 0 1px 0 rgba(255,255,255,.6);
+            border:1px solid rgba(255,255,255,.2); animation:fadeIn 1s ease-in-out; position:relative;
+        }
+        @keyframes fadeIn { 0%{opacity:0; transform:scale(.95)} 100%{opacity:1; transform:scale(1)} }
+
+        /* Back Button (hitam) */
+        .back-button {
+            position:absolute; top:20px; left:20px;
+            background:linear-gradient(135deg,#111,#333);
+            color:#fff; border:none; border-radius:8px;
+            padding:10px 16px; font-size:14px; font-weight:600; cursor:pointer;
+            display:flex; align-items:center; gap:6px; transition:all .3s ease;
+            box-shadow:0 4px 8px rgba(0,0,0,.3);
+        }
+        .back-button:hover {
+            background:linear-gradient(135deg,#000,#444);
+            transform:translateY(-2px);
+        }
+        .back-button:active {
+            transform:translateY(0);
+            box-shadow:0 4px 8px rgba(0,0,0,.1);
+        }
+
+        .header { text-align:center; margin-bottom:30px; }
+        .header h1 {
+            font-size:2rem; font-weight:700; margin-bottom:10px;
+            background:linear-gradient(135deg,#ff9a56,#ff8c00); -webkit-background-clip:text; color:transparent;
+            text-shadow:1px 1px 3px rgba(0,0,0,.1);
+        }
+        .header p { font-size:1rem; color:#555; }
+        .form-group { margin-bottom:20px; display:flex; flex-direction:column; }
+        .form-group label { font-size:1rem; font-weight:600; color:#333; margin-bottom:8px; }
+        .form-group input,.form-group select {
+            padding:12px; font-size:1rem; border-radius:8px; border:1px solid #ddd; background:rgba(255,255,255,.8);
+            box-shadow:0 4px 8px rgba(0,0,0,.1); transition:all .3s ease;
+        }
+        .form-group input:focus,.form-group select:focus {
+            border-color:#ff9a56; background:#fff; box-shadow:0 0 6px rgba(255,154,86,.4); outline:none;
+        }
+        .submit-btn {
+            padding:14px 20px; background:linear-gradient(135deg,#ff9a56,#ff8c00); color:#fff; border:none; border-radius:8px;
+            font-size:1.1rem; font-weight:600; cursor:pointer; width:100%; transition:background .3s ease;
+            text-align:center; display:inline-block; text-decoration:none;
+        }
+        .submit-btn:hover { background:linear-gradient(135deg,#ff8c00,#ff9a56); }
+        .submit-btn:active { transform:translateY(2px); box-shadow:0 4px 8px rgba(0,0,0,.1); }
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: #22c55e;
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+            z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .upload-excel-wrapper { text-align:center; margin-bottom:20px; }
+        .excel-btn {
+            padding:14px 20px;
+            background:linear-gradient(135deg,#2563eb,#1e40af);
+            color:#fff; border:none; border-radius:8px;
+            font-size:1.1rem; font-weight:600; cursor:pointer; width:100%;
+            text-align:center; display:inline-block; text-decoration:none;
+            box-shadow:0 4px 8px rgba(37,99,235,.3);
+        }
+        .excel-btn:hover { background:linear-gradient(135deg,#1e40af,#2563eb); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button class="back-button" onclick="goBack()" aria-label="Kembali">
+            <span>←</span>
+            <span>Kembali</span>
+        </button>
+
+        <!-- Tombol Upload Excel di atas judul -->
+        <div class="upload-excel-wrapper">
+            <a href="{{ route('upload.excel') }}" class="excel-btn" style="max-width:300px;">
+                📁 Upload Program via Excel
+            </a>
+        </div>
+
+        <div class="header">
+            <h1>Input Program Penelitian dan Pengabdian</h1>
+            <p>Lengkapi formulir di bawah ini untuk menambahkan program penelitian atau pengabdian</p>
+        </div>
+
+        {{-- Form input manual --}}
+        <form action="{{ route('programs.store') }}" method="POST" autocomplete="off">
+            @csrf
+            <div class="form-group">
+                <label for="tahun">Tahun</label>
+                <input type="text" id="tahun" name="tahun" placeholder="Masukkan Tahun" required>
+            </div>
+
+            <div class="form-group">
+                <label for="kategori">Kategori</label>
+                <input type="text" id="kategori" name="kategori" placeholder="Masukkan Kategori" required>
+            </div>
+
+            <div class="form-group">
+                <label for="skema">Skema</label>
+                <input type="text" id="skema" name="skema" placeholder="Masukkan Skema" required>
+            </div>
+
+            <div class="form-group">
+                <label for="judul">Judul</label>
+                <input type="text" id="judul" name="judul" placeholder="Masukkan judul" required>
+            </div>
+
+            <div class="form-group">
+                <label for="ketua">Ketua Program</label>
+                <input type="text" id="ketua" name="ketua" placeholder="Nama ketua program" required>
+            </div>
+
+            <div class="form-group">
+                <label for="anggota">Anggota Tim</label>
+                <input type="text" id="anggota" name="anggota" placeholder="Nama anggota tim (opsional)">
+            </div>
+
+            <div class="form-group">
+                <label for="dana">Dana Program (Rp)</label>
+                <input type="text" id="dana" name="dana" placeholder="Masukkan dana yang diperlukan" inputmode="numeric" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Tambah Program</button>
+        </form>
+    </div>
+
+    <!-- Toast Notification -->
+    @if(session('success'))
+    <div id="toast" class="toast">
+        ✔ Program berhasil ditambahkan! <br>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    <script>
+        // Back button functionality
+        function goBack() {
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = '/';
+            }
+        }
+
+        // Format ribuan untuk input Dana
+        document.getElementById('dana')?.addEventListener('input', function(event) {
+            const value = event.target.value.replace(/\D/g, '');
+            event.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        });
+
+        // Toast Animation
+        document.addEventListener('DOMContentLoaded', function () {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                setTimeout(() => { toast.classList.add('show'); }, 200);
+                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            }
+        });
+    </script>
+</body>
+</html>
