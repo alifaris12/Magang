@@ -41,13 +41,47 @@
         }
         .submit-btn {
             padding:14px 20px; background:linear-gradient(135deg,#ff9a56,#ff8c00); color:#fff; border:none; border-radius:8px;
-            font-size:1.1rem; font-weight:600; cursor:pointer; width:100%;
+            font-size:1.1rem; font-weight:600; cursor:pointer; width:100%; transition:background .3s ease;
+            text-align:center; display:inline-block; text-decoration:none;
         }
+        .submit-btn:hover { background:linear-gradient(135deg,#ff8c00,#ff9a56); }
+        .submit-btn:active { transform:translateY(2px); box-shadow:0 4px 8px rgba(0,0,0,.1); }
+        .toast {
+            position: fixed;
+            top: 20px; right: 20px;
+            background: #22c55e;
+            color: #fff;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,.15);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.5s ease;
+            z-index: 9999;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .upload-excel-wrapper { text-align:center; margin-bottom:20px; }
+        .excel-btn {
+            padding:14px 20px;
+            background:linear-gradient(135deg,#2563eb,#1e40af);
+            color:#fff; border:none; border-radius:8px;
+            font-size:1.1rem; font-weight:600; cursor:pointer; width:100%;
+            text-align:center; display:inline-block; text-decoration:none;
+            box-shadow:0 4px 8px rgba(37,99,235,.3);
+        }
+        .excel-btn:hover { background:linear-gradient(135deg,#1e40af,#2563eb); }
     </style>
 </head>
 <body>
     <div class="container">
         <button class="back-button" onclick="history.back()">← Kembali</button>
+
+        <div class="upload-excel-wrapper">
+            <a href="{{ route('upload.excel.kerjasama') }}" class="excel-btn" style="max-width:300px;">
+                📁 Upload Program via Excel
+            </a>
+        </div>
 
         <div class="header">
             <h1>Input Kerjasama</h1>
@@ -94,5 +128,22 @@
             <button type="submit" class="submit-btn">Tambah Kerjasama</button>
         </form>
     </div>
+
+    @if(session('success'))
+    <div id="toast" class="toast">
+        ✔ Program berhasil ditambahkan! <br>
+        {{ session('success') }}
+    </div>
+    @endif
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toast = document.getElementById('toast');
+            if (toast) {
+                setTimeout(() => { toast.classList.add('show'); }, 200);
+                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            }
+        });
+    </script>
 </body>
 </html>
