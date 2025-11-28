@@ -333,4 +333,12 @@ public function updateKerjasama(Request $request, $id)
             ->route('daftar.program')
             ->with('success', 'Program berhasil dihapus.');
     }
+
+    /** ====================================================
+     * FORM UPLOAD EXCEL KERJASAMA
+     * ==================================================== */
+    public function uploadKerjasamaForm()
+    {
+        return view('admin.program-upload-kerjasama');
+    }
 }
