@@ -1,182 +1,228 @@
-<?php
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pilih Program - Faculty of Economics and Business</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-// ========================================
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
 
-// 4. resources/views/dashboard/index.blade.php
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f7c842 0%, #f4a742 50%, #e8941a 100%);
+            color: #333;
+        }
 
-// ========================================
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 100;
+        }
 
-?>
+        .university-logo {
+            display: flex;
+            align-items: center;
+            color: #22529a;
+            font-weight: bold;
+        }
 
-@extends('layouts.app')
+        .logo-image {
+            height: 70px;
+            width: auto;
+            max-width: 250px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            transition: transform 0.3s ease;
+        }
 
-@section('title', 'User Dashboard - Faculty of Economics and Business')
+        .logo-image:hover { transform: scale(1.05); }
 
-@section('header')
+        .mascot {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 150px;
+            height: auto;
+            z-index: 10;
+            opacity: 0.9;
+            transition: transform 0.3s ease-in-out;
+        }
 
-    <h1 class="page-title">Welcome back, {{ $user->name }}!</h1>
+        .mascot:hover { transform: scale(1.1); }
 
-    <p class="page-subtitle">Here's what's happening with your account today.</p>
+        .profile-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 100;
+        }
 
-@endsection
+        .logout-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+        }
 
-@section('content')
+        .logout-btn:hover {
+            background: linear-gradient(135deg, #c82333 0%, #dc3545 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.4);
+        }
 
-<div class="content-card">
+        .logout-btn i { font-size: 18px; }
 
-    <h3 style="margin-bottom: 1.5rem; color: #333; font-weight: 600;">
+        .program-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 80px 20px;
+            margin-top: 80px;
+            text-align: center;
+            flex-grow: 1;
+        }
 
-        <i class="fas fa-chart-line" style="color: #667eea;"></i> Account Overview
+        .program-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #fff;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #22529a, #2a5ba8);
+            padding: 15px 40px;
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            animation: fadeInDown 0.8s ease;
+        }
 
-    </h3>
+        @keyframes fadeInDown {
+            0% { opacity: 0; transform: translateY(-30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+        .program-subtitle {
+            font-size: 22px;
+            margin-bottom: 40px;
+            color: #333;
+            font-weight: 700;
+            font-style: italic;
+        }
 
-        <!-- Profile Completion -->
+        .program-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
 
-        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 1.5rem; border-radius: 12px;">
+        .program-card {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            width: 250px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            text-decoration: none;
+            color: inherit;
+        }
 
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+        .program-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+        }
 
-                <div>
+        .program-card i {
+            font-size: 40px;
+            color: #22529a;
+            margin-bottom: 15px;
+        }
 
-                    <h4 style="font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;">{{ $stats['profile_completion'] }}%</h4>
+        .program-card h3 { font-size: 20px; margin-bottom: 15px; color: #22529a; }
 
-                    <p style="opacity: 0.9;">Profile Complete</p>
+        .program-card button {
+            background-color: #f7c842;
+            color: #22529a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
 
-                </div>
+        .program-card button:hover { background-color: #e8941a; }
 
-                <i class="fas fa-user-check" style="font-size: 2rem; opacity: 0.7;"></i>
+        @media (max-width: 768px) {
+            .program-card { width: 200px; padding: 20px; }
+            .program-title { font-size: 32px; padding: 10px 25px; }
+            .program-subtitle { font-size: 18px; }
+            .program-buttons { gap: 15px; }
+            .logout-btn { padding: 10px 18px; font-size: 14px; }
+        }
 
-            </div>
-
+        @media (max-width: 480px) {
+            .program-card { width: 150px; }
+            .program-title { font-size: 26px; padding: 8px 20px; }
+            .program-subtitle { font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="university-logo">
+            <img src="{{ asset('images/FEB-UB-Black-Teks-min 1.png') }}" class="logo-image" alt="University Logo">
         </div>
-
-        <!-- Account Created -->
-
-        <div style="background: linear-gradient(135deg, #2ed573 0%, #17a2b8 100%); color: white; padding: 1.5rem; border-radius: 12px;">
-
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-
-                <div>
-
-                    <h4 style="font-size: 1.2rem; font-weight: 600; margin-bottom: 0.5rem;">{{ $stats['account_created'] }}</h4>
-
-                    <p style="opacity: 0.9;">Member Since</p>
-
-                </div>
-
-                <i class="fas fa-calendar-alt" style="font-size: 2rem; opacity: 0.7;"></i>
-
-            </div>
-
-        </div>
-
-        <!-- Last Login -->
-
-        <div style="background: linear-gradient(135deg, #ffa726 0%, #ff7043 100%); color: white; padding: 1.5rem; border-radius: 12px;">
-
-            <div style="display: flex; align-items: center; justify-content: space-between;">
-
-                <div>
-
-                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 0.5rem;">{{ $stats['last_login'] }}</h4>
-
-                    <p style="opacity: 0.9;">Last Activity</p>
-
-                </div>
-
-                <i class="fas fa-clock" style="font-size: 2rem; opacity: 0.7;"></i>
-
-            </div>
-
-        </div>
-
     </div>
 
-</div>
+    <img src="{{ asset('images/maskot.png') }}" alt="Maskot" class="mascot">
 
-<div class="content-card">
-
-    <h3 style="margin-bottom: 1.5rem; color: #333; font-weight: 600;">
-
-        <i class="fas fa-user-circle" style="color: #667eea;"></i> Account Information
-
-    </h3>
-
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
-
-        <div>
-
-            <h4 style="color: #555; margin-bottom: 1rem;">Personal Details</h4>
-
-            {{-- PERBAIKAN DI BAWAH INI --}}
-            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-
-                <p><strong>Name:</strong> {{ $user->name }}</p>
-
-                <p><strong>Email:</strong> {{ $user->email }}</p>
-
-                <p><strong>Role:</strong> <span style="background: #e3f2fd; color: #1976d2; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">{{ ucfirst($user->role) }}</span></p>
-
-                <p><strong>Account Status:</strong> <span style="background: #e8f5e8; color: #2e7d32; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.875rem;">Active</span></p>
-
-            </div>
-
-        </div>
-
-        <div>
-
-            <h4 style="color: #555; margin-bottom: 1rem;">Quick Actions</h4>
-
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-
-                <a href="{{ route('user.profile') }}" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s ease;">
-
-                    <i class="fas fa-edit"></i> Edit Profile
-
-                </a>
-
-                <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: #dc3545; color: white; text-decoration: none; border-radius: 8px; transition: all 0.3s ease;">
-
-                    <i class="fas fa-sign-out-alt"></i> Logout
-
-                </a>
-
-            </div>
-
-        </div>
-
+    <div class="profile-container">
+        <form action="{{ route('logout') }}" method="POST">
+            @csrf
+            <button type="submit" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </form>
     </div>
 
-</div>
-
-<div class="content-card">
-
-    <h3 style="margin-bottom: 1.5rem; color: #333; font-weight: 600;">
-
-        <i class="fas fa-info-circle" style="color: #667eea;"></i> Getting Started
-
-    </h3>
-
-    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #667eea;">
-
-        <h4 style="color: #333; margin-bottom: 1rem;">Welcome to Faculty Dashboard</h4>
-
-        <p style="color: #666; margin-bottom: 1rem;">This is your personal dashboard where you can manage your account and access various features. Here are some things you can do:</p>
-
-        <ul style="color: #666; padding-left: 1.5rem;">
-
-            <li>Update your profile information</li>
-
-            <li>Change your password</li>
-
-            <li>View your account statistics</li>
-
-            <li>Access faculty resources</li>
-
-        </ul>
-
+    <div class="program-container">
+        <h2 class="program-title">Pilih Program</h2>
+        <p class="program-subtitle">Silahkan pilih kategori program yang ingin Anda akses</p>
+        <div class="program-buttons">
+            <a href="{{ route('user.daftar.program') }}" class="program-card">
+                <i class="fas fa-book"></i>
+                <h3>Daftar Program Penelitian & Pengabdian</h3>
+                <button>Lihat Daftar</button>
+            </a>
+            <a href="{{ route('user.daftar.kerjasama') }}" class="program-card">
+                <i class="fas fa-globe"></i>
+                <h3>Daftar Kerjasama Nasional & Internasional</h3>
+                <button>Lihat Daftar</button>
+            </a>
+        </div>
     </div>
-
-</div>  
+</body>
+</html>  

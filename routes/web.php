@@ -53,6 +53,9 @@ Route::post('logout', [LoginController::class, 'logout'])
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('user.dashboard');
     Route::get('/profile', [DashboardController::class, 'profile'])->name('user.profile');
+    
+    Route::get('/user/program-daftar', [ProgramController::class, 'index'])->name('user.daftar.program');
+    Route::get('/user/program-kerjasama', [ProgramController::class, 'daftarKerjasama'])->name('user.daftar.kerjasama');
 });
 
 /* ================================
@@ -100,14 +103,19 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarNasional'])->name('daftar.kerjasama.nasional');
     Route::get('/program-kerjasama/internasional', [ProgramController::class, 'daftarInternasional'])->name('daftar.kerjasama.internasional');
     Route::get('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasamaForm'])->name('upload.excel.kerjasama');
-Route::get('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'show'])->name('program-kerjasama.show.json');
-Route::get('/program-kerjasama/{program}/edit', [ProgramKerjasamaController::class, 'edit'])->name('program-kerjasama.edit.json');
-Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarKerjasama'])->name('daftar.kerjasama.nasional');
-// Rute untuk halaman edit program kerjasama
-Route::get('/program-kerjasama/{program}/edit', [ProgramController::class, 'editKerjasama'])->name('program-kerjasama.edit');
+    Route::get('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'show'])->name('program-kerjasama.show.json');
+    Route::get('/program-kerjasama/{program}/edit', [ProgramKerjasamaController::class, 'edit'])->name('program-kerjasama.edit.json');
+    Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarKerjasama'])->name('daftar.kerjasama.nasional');
+    Route::get('/program-kerjasama/{program}/edit', [ProgramController::class, 'editKerjasama'])->name('program-kerjasama.edit');
 
-// Rute untuk update program kerjasama
-Route::put('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'update'])->name('program-kerjasama.update');
+    Route::put('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'update'])->name('program-kerjasama.update');
+    
+    // CRUD PROGRAM KERJASAMA
+    Route::prefix('program-kerjasama')->group(function () {
+        Route::put('/{program}', [ProgramKerjasamaController::class, 'update'])->name('program-kerjasama.update');
+        
+        Route::delete('/{program}', [ProgramKerjasamaController::class, 'destroy'])->name('program-kerjasama.destroy');
+    });
 
 
 
@@ -128,17 +136,7 @@ Route::put('/program-kerjasama/{program}', [ProgramKerjasamaController::class, '
     });
 
     // ✅ Halaman Upload Excel program penelitian dan pengabdian
-  Route::get('/program-upload', [ProgramController::class, 'uploadForm'])->name('upload.excel');
-});
-
-// 🔧 CRUD PROGRAM KERJASAMA
-Route::prefix('program-kerjasama')->group(function () {
-    // JSON show (sudah di atas), JSON edit (sudah di atas)
-    // Update program kerjasama
-    Route::put('/{program}', [ProgramKerjasamaController::class, 'update'])->name('program-kerjasama.update');
-    
-    // Hapus program kerjasama
-    Route::delete('/{program}', [ProgramKerjasamaController::class, 'destroy'])->name('program-kerjasama.destroy');
+    Route::get('/program-upload', [ProgramController::class, 'uploadForm'])->name('upload.excel');
 });
 
 

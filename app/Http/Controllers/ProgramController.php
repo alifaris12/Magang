@@ -6,6 +6,8 @@ use App\Models\Program;
 use App\Models\ProgramKerjasama;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProgramImport;
 
@@ -42,13 +44,19 @@ class ProgramController extends Controller
         $table = (new Program)->getTable();
         $sortCol = Schema::hasColumn($table, 'created_at') ? 'created_at' : 'id';
 
-        $programs = $query->orderByDesc($sortCol)->paginate(500);
+        // Filter jumlah item per halaman
+        $perPage = $request->filled('per_page') ? (int) $request->per_page : 500;
+        $perPage = in_array($perPage, [10, 25, 50, 100, 200, 500]) ? $perPage : 500;
+
+        $programs = $query->orderByDesc($sortCol)->paginate($perPage)->withQueryString();
 
         // Data unik untuk filter dropdown
         $skemas = Program::select('skema')->distinct()->pluck('skema');
         $tahuns = Program::select('tahun')->distinct()->orderByDesc('tahun')->pluck('tahun');
 
-        return view('admin.program-daftar', compact('programs', 'skemas', 'tahuns'));
+        $view = (Auth::check() && Auth::user()->role === 'user') ? 'user.program-daftar' : 'admin.program-daftar';
+
+        return view($view, compact('programs', 'skemas', 'tahuns'));
     }
 
     /** ====================================================
@@ -231,14 +239,31 @@ public function updateKerjasama(Request $request, $id)
             });
         }
 
-        // Ambil data dan kirim ke view
-        $programKerjasama = $query->orderByDesc('tahun')->paginate(10);
+        // Filter untuk user biasa: sembunyikan program yang sudah selesai (tanggal sekarang > tanggal selesai)
+        // Admin melihat semua data, user hanya melihat yang belum selesai atau masih aktif
+        $isUser = Auth::check() && Auth::user()->role === 'user';
+        if ($isUser) {
+            // Hanya tampilkan program yang tanggal selesainya >= hari ini (belum selesai)
+            // Menggunakan Carbon untuk memastikan perbandingan tanggal yang benar
+            $today = Carbon::today()->toDateString();
+            $query->whereDate('tanggal_selesai', '>=', $today);
+        }
 
-        // Ambil data tahun untuk filter
+        // Filter jumlah item per halaman
+        $perPage = $request->filled('per_page') ? (int) $request->per_page : 10;
+        $perPage = in_array($perPage, [10, 25, 50, 100, 200, 500]) ? $perPage : 10;
+
+        // Ambil data dan kirim ke view
+        $programKerjasama = $query->orderByDesc('tahun')->paginate($perPage)->withQueryString();
+
+        // Ambil data tahun untuk filter (dari semua data, tidak difilter tanggal untuk dropdown)
         $tahuns = ProgramKerjasama::select('tahun')->distinct()->orderByDesc('tahun')->pluck('tahun');
 
+        // Tentukan view berdasarkan role
+        $view = $isUser ? 'user.program-kerjasama' : 'admin.program-nasional';
+
         // Kirim data ke view
-        return view('admin.program-nasional', compact('programKerjasama', 'tahuns'));
+        return view($view, compact('programKerjasama', 'tahuns'));
     }
 
     /** ====================================================
@@ -332,5 +357,13 @@ public function updateKerjasama(Request $request, $id)
         return redirect()
             ->route('daftar.program')
             ->with('success', 'Program berhasil dihapus.');
+    }
+
+    /** ====================================================
+     * FORM UPLOAD EXCEL KERJASAMA
+     * ==================================================== */
+    public function uploadKerjasamaForm()
+    {
+        return view('admin.program-upload-kerjasama');
     }
 }

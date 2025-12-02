@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar Program Penelitian dan Pengabdian</title>
+    <title>Daftar Program Kerjasama Nasional dan Internasional</title>
      <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -17,9 +17,6 @@
         @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
         .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px;}
         .header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ff9a56,#ff8c00);-webkit-background-clip:text;color:transparent;}
-        .tambah-btn{padding:12px 24px;background:linear-gradient(135deg,#ff9a56,#ff8c00);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;
-            cursor:pointer;transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
-        .tambah-btn:hover{background:linear-gradient(135deg,#ff8c00,#ff9a56);transform:translateY(-2px);}
         .back-btn{
             padding:12px 24px;
             background:linear-gradient(135deg,#6b7280,#4b5563);
@@ -62,10 +59,6 @@
         .action-btn{padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.3s;margin-right:6px;text-decoration:none;display:inline-block;}
         .btn-view{background:rgba(8,145,178,.1);color:#0891b2;border:1px solid rgba(8,145,178,.2);}
         .btn-view:hover{background:#0891b2;color:#fff;}
-        .btn-edit{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);}
-        .btn-edit:hover{background:#d97706;color:#fff;}
-        .btn-delete{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);}
-        .btn-delete:hover{background:#dc2626;color:#fff;}
         .empty-state{text-align:center;padding:60px 20px;color:#666;}
         .alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:500;}
         .alert-success{background:rgba(34,197,94,.1);color:#16a34a;}
@@ -80,16 +73,13 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
-            <h1>Daftar Program Penelitian dan Pengabdian</h1>
+            <h1>Daftar Kerjasama Nasional dan Internasional</h1>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button onclick="history.back()" class="back-btn">⬅ Back</button>
-                <a href="{{ route('input.program') }}" class="tambah-btn">+ Tambah Program</a>
+                <a href="{{ route('user.dashboard') }}" class="back-btn">⬅ Kembali ke Dashboard</a>
             </div>
         </div>
 
-        <!-- Alert -->
         @if(session('success'))
             <div class="alert alert-success">✔ {{ session('success') }}</div>
         @endif
@@ -97,32 +87,26 @@
             <div class="alert alert-error">❌ {{ session('error') }}</div>
         @endif
 
-        <!-- Filter -->
         <div class="filter-section">
-            <form method="GET" action="{{ route('daftar.program') }}">
+            <form method="GET" action="{{ route('user.daftar.kerjasama') }}">
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label for="per_page">Per Halaman</label>
                         <select name="per_page" id="per_page" class="filter-select">
-                            <option value="10" {{ request('per_page') == '10' ? 'selected' : '' }}>10</option>
+                            <option value="10" {{ request('per_page') == '10' || !request('per_page') ? 'selected' : '' }}>10</option>
                             <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25</option>
                             <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
                             <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100</option>
                             <option value="200" {{ request('per_page') == '200' ? 'selected' : '' }}>200</option>
-                            <option value="500" {{ request('per_page') == '500' || !request('per_page') ? 'selected' : '' }}>500</option>
+                            <option value="500" {{ request('per_page') == '500' ? 'selected' : '' }}>500</option>
                         </select>
                     </div>
                     <div class="filter-group">
-                        <label for="skema">Skema</label>
-                        <select name="skema" id="skema" class="filter-select">
-                            <option value="">Semua Skema</option>
-                            @isset($skemas)
-                                @foreach($skemas as $skema)
-                                    <option value="{{ $skema }}" {{ request('skema') == $skema ? 'selected' : '' }}>
-                                        {{ ucfirst($skema) }}
-                                    </option>
-                                @endforeach
-                            @endisset
+                        <label for="tingkat">Tingkat</label>
+                        <select name="tingkat" id="tingkat" class="filter-select">
+                            <option value="">Semua Tingkat</option>
+                            <option value="nasional" {{ request('tingkat') == 'nasional' ? 'selected' : '' }}>Nasional</option>
+                            <option value="internasional" {{ request('tingkat') == 'internasional' ? 'selected' : '' }}>Internasional</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -141,29 +125,27 @@
                     <div class="filter-group">
                         <label for="search">Pencarian</label>
                         <input type="text" name="search" id="search" class="filter-input"
-                               placeholder="Cari judul, ketua, atau kata kunci..." value="{{ request('search') }}">
+                               placeholder="Cari mitra kerjasama..." value="{{ request('search') }}">
                     </div>
                     <button type="submit" class="search-btn">🔍 Filter</button>
                 </div>
             </form>
         </div>
 
-        <!-- Tabel -->
         <div class="table-container">
-            @isset($programs)
-                @forelse($programs as $program)
+            @isset($programKerjasama)
+                @forelse($programKerjasama as $program)
                     @if($loop->first)
                         <table class="data-table">
                             <thead>
                                 <tr>
                                     <th>No</th>
+                                    <th>Mitra Kerjasama</th>
                                     <th>Tahun</th>
-                                    <th>Kategori</th>
-                                    <th>Skema</th>
-                                    <th>Judul</th>
-                                    <th>Ketua</th>
-                                    <th>Dana</th>
-                                    <th>Anggota</th>
+                                    <th>Jangka Waktu</th>
+                                    <th>Tanggal Mulai</th>
+                                    <th>Tanggal Selesai</th>
+                                    <th>Tingkat</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -171,23 +153,15 @@
                     @endif
                     <tr>
                         <td>{{ $loop->iteration }}</td>
+                        <td>{{ $program->mitra_kerjasama }}</td>
                         <td>{{ $program->tahun }}</td>
-                        <td>{{ $program->kategori }}</td>
-                        <td>{{ $program->skema }}</td>
-                        <td>{{ \Illuminate\Support\Str::limit($program->judul, 60) }}</td>
-                        <td>{{ $program->ketua }}</td>
-                        <td style="color:#059669;font-weight:600;">Rp {{ number_format($program->dana,0,',','.') }}</td>
-                        <td>{{ $program->anggota ?? '-' }}</td>
+                        <td>{{ $program->jangka_waktu }}</td>
+                        <td>{{ \Carbon\Carbon::parse($program->tanggal_mulai)->format('d-m-Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($program->tanggal_selesai)->format('d-m-Y') }}</td>
+                        <td>{{ ucfirst($program->tingkat) }}</td>
                         <td>
                             <a href="javascript:void(0)" data-program='@json($program)'
                                onclick="openModal(this)" class="action-btn btn-view">👁</a>
-                            <a href="javascript:void(0)" data-program='@json($program)'
-                               onclick="openEditModal(this)" class="action-btn btn-edit">✏️</a>
-                            <form method="POST" action="{{ route('programs.destroy',$program->id) }}"
-                                  style="display:inline;" onsubmit="return confirm('Hapus program ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="action-btn btn-delete">🗑️</button>
-                            </form>
                         </td>
                     </tr>
                     @if($loop->last)
@@ -196,108 +170,48 @@
                     @endif
                 @empty
                     <div class="empty-state">
-                        <h3>📋 Belum Ada Program</h3>
-                        <p>Belum ada program penelitian atau pengabdian yang terdaftar.</p>
+                        <h3>📋 Belum Ada Program Kerjasama</h3>
+                        <p>Belum ada program kerjasama nasional maupun internasional yang terdaftar.</p>
                     </div>
                 @endforelse
             @endisset
         </div>
 
-        <!-- Pagination -->
-        @if(isset($programs) && $programs->hasPages())
+        @if(isset($programKerjasama) && $programKerjasama->hasPages())
             <div style="margin-top:20px; text-align:center;">
-                {{ $programs->links() }}
+                {{ $programKerjasama->links() }}
             </div>
         @endif
     </div>
 
-    <!-- Modal Detail -->
     <div id="programModal" class="modal" onclick="if(event.target === this) closeModal()">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Detail Program</h2>
+                <h2>Detail Program Kerjasama</h2>
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             <div id="modalBody"></div>
         </div>
     </div>
 
-    <!-- Modal Edit -->
-    <div id="editModal" class="modal" onclick="if(event.target === this) closeEditModal()">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Program</h2>
-                <button class="close-btn" onclick="closeEditModal()">×</button>
-            </div>
-            <form id="editForm" method="POST">
-                @csrf @method('PUT')
-                <div class="filter-group">
-                    <label>Judul</label>
-                    <input type="text" name="judul" id="editJudul" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Ketua</label>
-                    <input type="text" name="ketua" id="editKetua" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Anggota</label>
-                    <input type="text" name="anggota" id="editAnggota" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <label>Tahun</label>
-                    <input type="number" name="tahun" id="editTahun" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Kategori</label>
-                    <input type="text" name="kategori" id="editKategori" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Skema</label>
-                    <input type="text" name="skema" id="editSkema" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Dana</label>
-                    <input type="number" name="dana" id="editDana" class="filter-input" required>
-                </div>
-                <div style="margin-top:15px; text-align:right;">
-                    <button type="button" class="search-btn" onclick="closeEditModal()">Batal</button>
-                    <button type="submit" class="tambah-btn">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <script>
         function openModal(element){
             const program = JSON.parse(element.getAttribute('data-program'));
+            const tanggalMulai = new Date(program.tanggal_mulai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
+            const tanggalSelesai = new Date(program.tanggal_selesai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
             let body = `
-                <p><b>Judul:</b> ${program.judul}</p>
-                <p><b>Ketua:</b> ${program.ketua}</p>
-                <p><b>Anggota:</b> ${program.anggota ?? '-'}</p>
+                <p><b>Mitra Kerjasama:</b> ${program.mitra_kerjasama}</p>
                 <p><b>Tahun:</b> ${program.tahun}</p>
-                <p><b>Kategori:</b> ${program.kategori}</p>
-                <p><b>Skema:</b> ${program.skema}</p>
-                <p><b>Dana:</b> Rp ${new Intl.NumberFormat('id-ID').format(program.dana)}</p>`;
+                <p><b>Jangka Waktu:</b> ${program.jangka_waktu}</p>
+                <p><b>Tanggal Mulai:</b> ${tanggalMulai}</p>
+                <p><b>Tanggal Selesai:</b> ${tanggalSelesai}</p>
+                <p><b>Tingkat:</b> ${program.tingkat.charAt(0).toUpperCase() + program.tingkat.slice(1)}</p>`;
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('programModal').style.display = 'flex';
         }
 
         function closeModal(){ document.getElementById('programModal').style.display='none'; }
-
-        function openEditModal(element){
-            const program = JSON.parse(element.getAttribute('data-program'));
-            document.getElementById('editForm').action = `/programs/${program.id}`;
-            document.getElementById('editJudul').value = program.judul;
-            document.getElementById('editKetua').value = program.ketua;
-            document.getElementById('editAnggota').value = program.anggota ?? '';
-            document.getElementById('editTahun').value = program.tahun;
-            document.getElementById('editKategori').value = program.kategori;
-            document.getElementById('editSkema').value = program.skema;
-            document.getElementById('editDana').value = program.dana;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function closeEditModal(){ document.getElementById('editModal').style.display='none'; }
     </script>
 </body>
 </html>
+

@@ -17,9 +17,6 @@
         @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
         .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px;}
         .header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ff9a56,#ff8c00);-webkit-background-clip:text;color:transparent;}
-        .tambah-btn{padding:12px 24px;background:linear-gradient(135deg,#ff9a56,#ff8c00);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;
-            cursor:pointer;transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
-        .tambah-btn:hover{background:linear-gradient(135deg,#ff8c00,#ff9a56);transform:translateY(-2px);}
         .back-btn{
             padding:12px 24px;
             background:linear-gradient(135deg,#6b7280,#4b5563);
@@ -62,10 +59,6 @@
         .action-btn{padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.3s;margin-right:6px;text-decoration:none;display:inline-block;}
         .btn-view{background:rgba(8,145,178,.1);color:#0891b2;border:1px solid rgba(8,145,178,.2);}
         .btn-view:hover{background:#0891b2;color:#fff;}
-        .btn-edit{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);}
-        .btn-edit:hover{background:#d97706;color:#fff;}
-        .btn-delete{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);}
-        .btn-delete:hover{background:#dc2626;color:#fff;}
         .empty-state{text-align:center;padding:60px 20px;color:#666;}
         .alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:500;}
         .alert-success{background:rgba(34,197,94,.1);color:#16a34a;}
@@ -84,12 +77,10 @@
         <div class="header">
             <h1>Daftar Program Penelitian dan Pengabdian</h1>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button onclick="history.back()" class="back-btn">⬅ Back</button>
-                <a href="{{ route('input.program') }}" class="tambah-btn">+ Tambah Program</a>
+                <a href="{{ route('user.dashboard') }}" class="back-btn">⬅ Kembali ke Dashboard</a>
             </div>
         </div>
 
-        <!-- Alert -->
         @if(session('success'))
             <div class="alert alert-success">✔ {{ session('success') }}</div>
         @endif
@@ -97,9 +88,8 @@
             <div class="alert alert-error">❌ {{ session('error') }}</div>
         @endif
 
-        <!-- Filter -->
         <div class="filter-section">
-            <form method="GET" action="{{ route('daftar.program') }}">
+            <form method="GET" action="{{ route('user.daftar.program') }}">
                 <div class="filter-grid">
                     <div class="filter-group">
                         <label for="per_page">Per Halaman</label>
@@ -148,7 +138,6 @@
             </form>
         </div>
 
-        <!-- Tabel -->
         <div class="table-container">
             @isset($programs)
                 @forelse($programs as $program)
@@ -181,13 +170,6 @@
                         <td>
                             <a href="javascript:void(0)" data-program='@json($program)'
                                onclick="openModal(this)" class="action-btn btn-view">👁</a>
-                            <a href="javascript:void(0)" data-program='@json($program)'
-                               onclick="openEditModal(this)" class="action-btn btn-edit">✏️</a>
-                            <form method="POST" action="{{ route('programs.destroy',$program->id) }}"
-                                  style="display:inline;" onsubmit="return confirm('Hapus program ini?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="action-btn btn-delete">🗑️</button>
-                            </form>
                         </td>
                     </tr>
                     @if($loop->last)
@@ -203,7 +185,6 @@
             @endisset
         </div>
 
-        <!-- Pagination -->
         @if(isset($programs) && $programs->hasPages())
             <div style="margin-top:20px; text-align:center;">
                 {{ $programs->links() }}
@@ -211,7 +192,6 @@
         @endif
     </div>
 
-    <!-- Modal Detail -->
     <div id="programModal" class="modal" onclick="if(event.target === this) closeModal()">
         <div class="modal-content">
             <div class="modal-header">
@@ -219,51 +199,6 @@
                 <button class="close-btn" onclick="closeModal()">×</button>
             </div>
             <div id="modalBody"></div>
-        </div>
-    </div>
-
-    <!-- Modal Edit -->
-    <div id="editModal" class="modal" onclick="if(event.target === this) closeEditModal()">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Edit Program</h2>
-                <button class="close-btn" onclick="closeEditModal()">×</button>
-            </div>
-            <form id="editForm" method="POST">
-                @csrf @method('PUT')
-                <div class="filter-group">
-                    <label>Judul</label>
-                    <input type="text" name="judul" id="editJudul" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Ketua</label>
-                    <input type="text" name="ketua" id="editKetua" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Anggota</label>
-                    <input type="text" name="anggota" id="editAnggota" class="filter-input">
-                </div>
-                <div class="filter-group">
-                    <label>Tahun</label>
-                    <input type="number" name="tahun" id="editTahun" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Kategori</label>
-                    <input type="text" name="kategori" id="editKategori" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Skema</label>
-                    <input type="text" name="skema" id="editSkema" class="filter-input" required>
-                </div>
-                <div class="filter-group">
-                    <label>Dana</label>
-                    <input type="number" name="dana" id="editDana" class="filter-input" required>
-                </div>
-                <div style="margin-top:15px; text-align:right;">
-                    <button type="button" class="search-btn" onclick="closeEditModal()">Batal</button>
-                    <button type="submit" class="tambah-btn">Simpan</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -283,21 +218,7 @@
         }
 
         function closeModal(){ document.getElementById('programModal').style.display='none'; }
-
-        function openEditModal(element){
-            const program = JSON.parse(element.getAttribute('data-program'));
-            document.getElementById('editForm').action = `/programs/${program.id}`;
-            document.getElementById('editJudul').value = program.judul;
-            document.getElementById('editKetua').value = program.ketua;
-            document.getElementById('editAnggota').value = program.anggota ?? '';
-            document.getElementById('editTahun').value = program.tahun;
-            document.getElementById('editKategori').value = program.kategori;
-            document.getElementById('editSkema').value = program.skema;
-            document.getElementById('editDana').value = program.dana;
-            document.getElementById('editModal').style.display = 'flex';
-        }
-
-        function closeEditModal(){ document.getElementById('editModal').style.display='none'; }
     </script>
 </body>
 </html>
+
