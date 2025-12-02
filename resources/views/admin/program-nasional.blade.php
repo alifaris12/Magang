@@ -46,7 +46,7 @@
             100% {opacity:1; transform:translateX(0);}
         }
         .filter-section{background:rgba(255,255,255,.6);backdrop-filter:blur(5px);border-radius:12px;padding:20px;margin-bottom:25px;border:1px solid rgba(255,255,255,.3);}
-        .filter-grid{display:grid;grid-template-columns:1fr 1fr 2fr auto;gap:15px;align-items:end;}
+        .filter-grid{display:grid;grid-template-columns:120px 1fr 1fr 2fr auto;gap:15px;align-items:end;}
         .filter-group{display:flex;flex-direction:column;}
         .filter-group label{font-weight:600;margin-bottom:6px;font-size:14px;}
         .filter-select,.filter-input{padding:10px 12px;border:2px solid #e1e5e9;border-radius:8px;font-size:14px;background:rgba(255,255,255,.9);transition:.3s;}
@@ -99,6 +99,17 @@
         <div class="filter-section">
             <form method="GET" action="{{ route('daftar.kerjasama.nasional') }}">
                 <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="per_page">Per Halaman</label>
+                        <select name="per_page" id="per_page" class="filter-select">
+                            <option value="10" {{ request('per_page') == '10' || !request('per_page') ? 'selected' : '' }}>10</option>
+                            <option value="25" {{ request('per_page') == '25' ? 'selected' : '' }}>25</option>
+                            <option value="50" {{ request('per_page') == '50' ? 'selected' : '' }}>50</option>
+                            <option value="100" {{ request('per_page') == '100' ? 'selected' : '' }}>100</option>
+                            <option value="200" {{ request('per_page') == '200' ? 'selected' : '' }}>200</option>
+                            <option value="500" {{ request('per_page') == '500' ? 'selected' : '' }}>500</option>
+                        </select>
+                    </div>
                     <div class="filter-group">
                         <label for="tingkat">Tingkat</label>
                         <select name="tingkat" id="tingkat" class="filter-select">
@@ -182,9 +193,10 @@
             @endisset
         </div>
 
-        @if(isset($programKerjasama) && method_exists($programKerjasama,'appends'))
+        <!-- Pagination -->
+        @if(isset($programKerjasama) && $programKerjasama->hasPages())
             <div style="margin-top:20px; text-align:center;">
-                {{ $programKerjasama->appends(request()->query())->links() }}
+                {{ $programKerjasama->links() }}
             </div>
         @endif
     </div>
