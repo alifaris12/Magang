@@ -102,7 +102,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::view('/program-kerjasama/input', 'admin.input-kerjasama')->name('input.kerjasama');
     Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarNasional'])->name('daftar.kerjasama.nasional');
     Route::get('/program-kerjasama/internasional', [ProgramController::class, 'daftarInternasional'])->name('daftar.kerjasama.internasional');
-    Route::get('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasamaForm'])->name('upload.excel.kerjasama');
+        Route::get('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasamaForm'])->name('upload.excel.kerjasama');
+        Route::post('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasama'])->name('upload.kerjasama');
+        Route::get('/program-kerjasama/template', [ProgramController::class, 'templateKerjasama'])->name('template.kerjasama');
     Route::get('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'show'])->name('program-kerjasama.show.json');
     Route::get('/program-kerjasama/{program}/edit', [ProgramKerjasamaController::class, 'edit'])->name('program-kerjasama.edit.json');
     Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarKerjasama'])->name('daftar.kerjasama.nasional');
