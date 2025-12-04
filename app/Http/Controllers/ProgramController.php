@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProgramImport;
+use App\Imports\ProgramKerjasamaImport;
 
 class ProgramController extends Controller
 {
@@ -365,5 +366,101 @@ public function updateKerjasama(Request $request, $id)
     public function uploadKerjasamaForm()
     {
         return view('admin.program-upload-kerjasama');
+    }
+
+    /** ====================================================
+     * UPLOAD EXCEL KERJASAMA
+     * ==================================================== */
+    public function uploadKerjasama(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new ProgramKerjasamaImport, $request->file('file'));
+            return redirect()->route('daftar.kerjasama.nasional')
+                ->with('success', 'Data program kerjasama berhasil diupload.');
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->back()
+                ->with('error', 'Terjadi kesalahan saat import: ' . $e->getMessage());
+        }
+    }
+
+    /** ====================================================
+     * TEMPLATE DOWNLOAD KERJASAMA
+     * ==================================================== */
+    public function templateKerjasama()
+    {
+        $templateDir = public_path('templates');
+        $filePath = $templateDir . '/template_kerjasama.xlsx';
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath, 'Template_Kerjasama.xlsx');
+        }
+
+        // Jika template tidak ada, buat template sederhana
+        return $this->generateTemplateKerjasama();
+    }
+
+    /** ====================================================
+     * GENERATE TEMPLATE KERJASAMA
+     * ==================================================== */
+    private function generateTemplateKerjasama()
+    {
+        try {
+            $data = [
+                [
+                    'Mitra Kerjasama',
+                    'Tahun',
+                    'Jangka Waktu',
+                    'Tanggal Mulai',
+                    'Tanggal Selesai',
+                    'Tingkat'
+                ],
+                [
+                    'Contoh Mitra 1',
+                    '2024',
+                    '2 Tahun',
+                    '2024-01-01',
+                    '2025-12-31',
+                    'nasional'
+                ],
+                [
+                    'Contoh Mitra 2',
+                    '2024',
+                    '3 Tahun',
+                    '2024-06-01',
+                    '2027-05-31',
+                    'internasional'
+                ],
+            ];
+
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray($data, null, 'A1');
+
+            // Style header
+            $sheet->getStyle('A1:F1')->getFont()->setBold(true);
+            $sheet->getStyle('A1:F1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FF0891B2');
+            $sheet->getStyle('A1:F1')->getFont()->getColor()->setARGB('FFFFFFFF');
+
+            // Auto width
+            foreach (range('A', 'F') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), 'template_kerjasama_');
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, 'Template_Kerjasama.xlsx')->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal membuat template: ' . $e->getMessage());
+        }
     }
 }
