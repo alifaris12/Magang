@@ -193,13 +193,24 @@
         <p class="subtitle">Upload file Excel untuk menambahkan data program kerjasama</p>
       </div>
 
+      @if(session('success'))
+        <div style="background: rgba(34,197,94,0.1); color: #16a34a; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          ✔ {{ session('success') }}
+        </div>
+      @endif
+      @if(session('error'))
+        <div style="background: rgba(239,68,68,0.1); color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          ❌ {{ session('error') }}
+        </div>
+      @endif
+
       <div class="download-wrapper">
-        <a href="#" class="download-btn" onclick="alert('Template Excel untuk kerjasama akan segera tersedia'); return false;">
+        <a href="{{ route('template.kerjasama') }}" class="download-btn">
           📥 Download Template Excel
         </a>
       </div>
 
-      <form action="#" method="POST" enctype="multipart/form-data" onsubmit="alert('Fitur upload Excel untuk kerjasama akan segera tersedia'); return false;">
+      <form action="{{ route('upload.kerjasama') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="upload-area" id="uploadArea">
           <div class="upload-icon">📁</div>
