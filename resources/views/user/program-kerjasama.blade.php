@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar Program Kerjasama Nasional dan Internasional</title>
+<<<<<<< HEAD
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
      <style>
         * { margin:0; padding:0; box-sizing:border-box; }
         body {
@@ -18,9 +21,12 @@
         @keyframes fadeIn{0%{opacity:0;transform:scale(.95)}100%{opacity:1;transform:scale(1)}}
         .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:15px;}
         .header h1{font-size:2rem;font-weight:700;background:linear-gradient(135deg,#ff9a56,#ff8c00);-webkit-background-clip:text;color:transparent;}
+<<<<<<< HEAD
         .tambah-btn{padding:12px 24px;background:linear-gradient(135deg,#ff9a56,#ff8c00);color:#fff;border:none;border-radius:8px;font-size:1rem;font-weight:600;
             cursor:pointer;transition:.3s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
         .tambah-btn:hover{background:linear-gradient(135deg,#ff8c00,#ff9a56);transform:translateY(-2px);}
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         .back-btn{
             padding:12px 24px;
             background:linear-gradient(135deg,#6b7280,#4b5563);
@@ -46,6 +52,7 @@
             0% {opacity:0; transform:translateX(-20px);}
             100% {opacity:1; transform:translateX(0);}
         }
+<<<<<<< HEAD
         
         /* Chart Section */
         .chart-section {
@@ -172,6 +179,8 @@
             margin-top: 4px;
         }
 
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         .filter-section{background:rgba(255,255,255,.6);backdrop-filter:blur(5px);border-radius:12px;padding:20px;margin-bottom:25px;border:1px solid rgba(255,255,255,.3);}
         .filter-grid{display:grid;grid-template-columns:120px 1fr 1fr 2fr auto;gap:15px;align-items:end;}
         .filter-group{display:flex;flex-direction:column;}
@@ -189,10 +198,13 @@
         .action-btn{padding:6px 12px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer;transition:.3s;margin-right:6px;text-decoration:none;display:inline-block;}
         .btn-view{background:rgba(8,145,178,.1);color:#0891b2;border:1px solid rgba(8,145,178,.2);}
         .btn-view:hover{background:#0891b2;color:#fff;}
+<<<<<<< HEAD
         .btn-edit{background:rgba(245,158,11,.1);color:#d97706;border:1px solid rgba(245,158,11,.2);}
         .btn-edit:hover{background:#d97706;color:#fff;}
         .btn-delete{background:rgba(239,68,68,.1);color:#dc2626;border:1px solid rgba(239,68,68,.2);}
         .btn-delete:hover{background:#dc2626;color:#fff;}
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         .empty-state{text-align:center;padding:60px 20px;color:#666;}
         .alert{padding:12px 16px;border-radius:8px;margin-bottom:20px;font-weight:500;}
         .alert-success{background:rgba(34,197,94,.1);color:#16a34a;}
@@ -217,12 +229,89 @@
             text-align: center;
         }
         
+<<<<<<< HEAD
         @media (max-width: 768px) {
             .data-table { min-width: 800px; }
             .filter-grid { grid-template-columns: 1fr; }
             .chart-container { height: 300px; }
             .chart-stats { grid-template-columns: 1fr; }
             .chart-controls { flex-direction: column; align-items: stretch; }
+=======
+        .pagination-nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .pagination-list {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            gap: 0;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .pagination-list li {
+            margin: 0;
+        }
+        .pagination-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .pagination-btn:hover:not(.pagination-btn-disabled):not(.pagination-btn-active) {
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(8, 145, 178, 0.3);
+        }
+        .pagination-btn-active {
+            background: linear-gradient(135deg, #ff9a56, #ff8c00) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 12px rgba(255, 140, 0, 0.3);
+            cursor: default;
+        }
+        .pagination-btn-disabled {
+            color: #9ca3af;
+            cursor: not-allowed;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        .pagination-btn-dots {
+            color: #6b7280;
+            cursor: default;
+        }
+        .pagination-btn-first {
+            margin-right: 4px;
+        }
+        .pagination-btn-last {
+            margin-left: 4px;
+        }
+        @media (max-width: 768px) {
+            .data-table { min-width: 800px; }
+            .pagination-btn {
+                min-width: 36px;
+                height: 36px;
+                padding: 0 10px;
+                font-size: 13px;
+            }
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         }
     </style>
 </head>
@@ -242,6 +331,7 @@
             <div class="alert alert-error">❌ {{ session('error') }}</div>
         @endif
 
+<<<<<<< HEAD
         <!-- Chart Section -->
         <div class="chart-section">
             <div class="chart-header">
@@ -294,6 +384,8 @@
             </div>
         </div>
 
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         <div class="filter-section">
             <form method="GET" action="{{ route('user.daftar.kerjasama') }}">
                 <div class="filter-grid">
@@ -405,6 +497,7 @@
     </div>
 
     <script>
+<<<<<<< HEAD
         // Chart data from Laravel
         const chartData = @json(isset($chartData) ? $chartData : []);
         let myChart = null;
@@ -540,6 +633,8 @@
             window.location.href = url.toString();
         }
 
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
         function openModal(element){
             const program = JSON.parse(element.getAttribute('data-program'));
             const tanggalMulai = new Date(program.tanggal_mulai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
@@ -556,6 +651,7 @@
         }
 
         function closeModal(){ document.getElementById('programModal').style.display='none'; }
+<<<<<<< HEAD
 
         function openEditModal(element){
             const program = JSON.parse(element.getAttribute('data-program'));
@@ -570,6 +666,8 @@
         }
 
         function closeEditModal(){ document.getElementById('editModal').style.display='none'; }
+=======
+>>>>>>> 1540333f2f0d9ebec58580c036a36c56f9ed5e00
     </script>
 </body>
 </html>
