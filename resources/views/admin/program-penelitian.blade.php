@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Daftar Program Penelitian dan Pengabdian - Fakultas Ekonomi dan Bisnis</title>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
@@ -11,7 +10,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body { 
+            height: 100%; 
+            overflow-x: hidden;
+        }
         body {
             font-family: 'Poppins', sans-serif;
             background: linear-gradient(135deg, #f7c842 0%, #f4a742 50%, #e8941a 100%);
@@ -19,6 +21,7 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            min-height: 100vh;
         }
 
         /* Header Section */
@@ -72,32 +75,34 @@
 
         /* Main Content Container */
         .main-container {
-            height: 100vh;
+
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 100px 20px 20px;
+            padding: 120px 20px 140px;
         }
 
         /* Title Section */
         .title-section {
             background: #22529a;
-            padding: 15px 40px;
+            padding: 20px 40px;
             border-radius: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             text-align: center;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
         }
         .title-section h2 {
             color: white;
             font-size: 28px;
             font-weight: 700;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .title-section h2 i { font-size: 24px; }
         .title-section p {
@@ -109,20 +114,21 @@
         /* Cards Container */
         .cards-container {
             display: flex;
-            gap: 25px;
+            gap: 30px;
             justify-content: center;
-            align-items: center;
-            flex-wrap: nowrap;
-            will-change: transform, opacity;
+            align-items: stretch;
+            flex-wrap: wrap;
+            max-width: 1200px;
+            width: 100%;
         }
 
         /* Program Card */
         .program-card {
             background: #ffffff;
-            padding: 25px;
+            padding: 30px 25px;
             border-radius: 15px;
-            width: 240px;
-            min-height: 280px;
+            width: 280px;
+            min-height: 300px;
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -140,28 +146,28 @@
             box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
         }
         .program-card i {
-            font-size: 35px;
+            font-size: 40px;
             color: #22529a;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         .program-card h3 {
-            font-size: 18px;
+            font-size: 20px;
             color: #22529a;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             font-weight: 600;
         }
         .program-card p {
-            font-size: 13px;
+            font-size: 14px;
             color: #666;
-            margin-bottom: 15px;
-            line-height: 1.4;
+            margin-bottom: 20px;
+            line-height: 1.5;
             flex-grow: 1;
         }
         .program-card button {
             background-color: #f7c842;
             color: #22529a;
             border: none;
-            padding: 8px 16px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
@@ -190,28 +196,231 @@
             z-index: 10;
             opacity: 0.9;
             transition: transform 0.3s ease-in-out;
+            pointer-events: none;
         }
         .mascot:hover { transform: scale(1.1); }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .main-container { padding: 90px 10px 10px; }
-            .title-section { padding: 12px 25px; }
-            .title-section h2 { font-size: 20px; }
-            .title-section p { font-size: 12px; }
-            .cards-container { gap: 15px; }
-            .program-card { width: 180px; min-height: 250px; padding: 20px 15px; }
-            .program-card h3 { font-size: 15px; }
-            .program-card p { font-size: 11px; }
-            .program-card i { font-size: 28px; }
-            .mascot { width: 100px; }
-            .logo-image { height: 50px; }
+        /* Tablet Responsive */
+        @media (max-width: 992px) {
+            .main-container { 
+                padding: 110px 20px 120px; 
+            }
+            .title-section { 
+                padding: 18px 30px; 
+                max-width: 95%;
+            }
+            .title-section h2 { font-size: 24px; }
+            .title-section p { font-size: 13px; }
+            .cards-container { gap: 20px; }
+            .program-card { 
+                width: 260px; 
+                min-height: 280px; 
+                padding: 25px 20px; 
+            }
+            .program-card h3 { font-size: 18px; }
+            .program-card p { font-size: 13px; }
+            .program-card i { font-size: 36px; }
+            .mascot { width: 120px; }
         }
+
+        /* Mobile Landscape & Small Tablets */
+        @media (max-width: 768px) {
+            .header {
+                top: 15px;
+                left: 15px;
+            }
+            .back-container {
+                top: 15px;
+                right: 15px;
+            }
+            .back-btn {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .back-btn span {
+                display: none;
+            }
+            .logo-image { height: 50px; }
+            .main-container { 
+                padding: 100px 15px 110px; 
+            }
+            .title-section { 
+                padding: 15px 20px; 
+                margin-bottom: 30px;
+                max-width: 100%;
+            }
+            .title-section h2 { 
+                font-size: 20px; 
+                gap: 8px;
+            }
+            .title-section h2 i { font-size: 20px; }
+            .title-section p { font-size: 12px; }
+            .cards-container { 
+                gap: 20px;
+                padding: 0 10px;
+            }
+            .program-card { 
+                width: 100%;
+                max-width: 320px;
+                min-height: 260px; 
+                padding: 25px 20px; 
+            }
+            .program-card h3 { font-size: 18px; }
+            .program-card p { font-size: 13px; }
+            .program-card i { font-size: 35px; }
+            .mascot { 
+                width: 100px; 
+                bottom: 15px;
+                right: 15px;
+            }
+        }
+
+        /* Mobile Portrait */
         @media (max-width: 480px) {
-            .cards-container { flex-direction: column; gap: 10px; }
-            .program-card { width: 220px; min-height: 230px; padding: 15px; }
-            .title-section h2 { font-size: 18px; }
-            .mascot { width: 80px; bottom: 10px; right: 10px; }
+            .header {
+                top: 10px;
+                left: 10px;
+            }
+            .back-container {
+                top: 10px;
+                right: 10px;
+            }
+            .back-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+                border-radius: 10px;
+            }
+            .back-btn i {
+                font-size: 14px;
+            }
+            .logo-image { height: 45px; }
+            .main-container { 
+                padding: 90px 10px 100px; 
+                justify-content: flex-start;
+            }
+            .title-section { 
+                padding: 12px 15px; 
+                margin-bottom: 25px;
+                border-radius: 12px;
+            }
+            .title-section h2 { 
+                font-size: 17px;
+                gap: 6px;
+                line-height: 1.3;
+            }
+            .title-section h2 i { 
+                font-size: 18px; 
+            }
+            .title-section p { 
+                font-size: 11px; 
+                line-height: 1.4;
+            }
+            .cards-container { 
+                gap: 15px;
+                padding: 0 5px;
+            }
+            .program-card { 
+                width: 100%;
+                max-width: 100%;
+                min-height: 240px; 
+                padding: 20px 15px; 
+            }
+            .program-card h3 { 
+                font-size: 17px; 
+                margin-bottom: 10px;
+            }
+            .program-card p { 
+                font-size: 12px; 
+                margin-bottom: 15px;
+            }
+            .program-card i { 
+                font-size: 32px; 
+                margin-bottom: 12px;
+            }
+            .program-card button {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .mascot { 
+                width: 80px; 
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Extra Small Devices */
+        @media (max-width: 360px) {
+            .logo-image { height: 40px; }
+            .back-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+            }
+            .title-section h2 { 
+                font-size: 16px; 
+            }
+            .title-section h2 i { 
+                font-size: 16px; 
+            }
+            .title-section p { 
+                font-size: 10px; 
+            }
+            .program-card { 
+                min-height: 220px; 
+                padding: 18px 12px; 
+            }
+            .program-card h3 { font-size: 16px; }
+            .program-card p { font-size: 11px; }
+            .program-card i { font-size: 30px; }
+            .mascot { width: 70px; }
+        }
+
+        /* Landscape Mobile Optimization */
+        @media (max-height: 500px) and (orientation: landscape) {
+            html, body {
+                overflow-y: auto;
+            }
+            .main-container {
+                padding: 80px 15px 80px;
+                min-height: auto;
+            }
+            .title-section {
+                margin-bottom: 20px;
+                padding: 10px 20px;
+            }
+            .title-section h2 {
+                font-size: 18px;
+            }
+            .title-section p {
+                font-size: 11px;
+            }
+            .cards-container {
+                flex-direction: row;
+                gap: 15px;
+            }
+            .program-card {
+                width: 220px;
+                min-height: 220px;
+                padding: 15px;
+            }
+            .program-card i {
+                font-size: 28px;
+                margin-bottom: 8px;
+            }
+            .program-card h3 {
+                font-size: 15px;
+                margin-bottom: 8px;
+            }
+            .program-card p {
+                font-size: 11px;
+                margin-bottom: 10px;
+            }
+            .program-card button {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+            .mascot {
+                width: 70px;
+            }
         }
     </style>
 </head>
@@ -226,7 +435,8 @@
     <!-- Back Button -->
     <div class="back-container">
         <a href="{{ route('admin.dashboard') }}" class="back-btn">
-            <i class="fas fa-arrow-left"></i> Kembali ke Dashboard
+            <i class="fas fa-arrow-left"></i>
+            <span>Kembali ke Dashboard</span>
         </a>
     </div>
 
@@ -236,7 +446,7 @@
         <div class="title-section">
             <h2>
                 <i class="fas fa-book-open"></i>
-                Daftar Program Penelitian dan Pengabdian
+                <span>Daftar Program Penelitian dan Pengabdian</span>
                 <i class="fas fa-handshake"></i>
             </h2>
             <p>Sistem Manajemen Data Penelitian dan Pengabdian Masyarakat</p>
