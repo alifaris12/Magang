@@ -59,6 +59,13 @@ Route::middleware(['auth', 'role:user'])->group(function () {
 });
 
 /* ================================
+| Public Routes (Template Downloads)
+| Bisa diakses tanpa login untuk download template
+================================ */
+Route::get('/programs/template', [ProgramController::class, 'template'])->name('programs.template');
+Route::get('/program-kerjasama/template', [ProgramController::class, 'templateKerjasama'])->name('template.kerjasama');
+
+/* ================================
 | Admin (auth + role:admin)
 ================================ */
 Route::middleware(['auth', 'admin'])->group(function () {
@@ -104,7 +111,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/program-kerjasama/internasional', [ProgramController::class, 'daftarInternasional'])->name('daftar.kerjasama.internasional');
         Route::get('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasamaForm'])->name('upload.excel.kerjasama');
         Route::post('/program-kerjasama/upload', [ProgramController::class, 'uploadKerjasama'])->name('upload.kerjasama');
-        Route::get('/program-kerjasama/template', [ProgramController::class, 'templateKerjasama'])->name('template.kerjasama');
+        // Route template kerjasama dipindahkan ke luar middleware admin (line ~60)
     Route::get('/program-kerjasama/{program}', [ProgramKerjasamaController::class, 'show'])->name('program-kerjasama.show.json');
     Route::get('/program-kerjasama/{program}/edit', [ProgramKerjasamaController::class, 'edit'])->name('program-kerjasama.edit.json');
     Route::get('/daftar-program-kerjasama-nasional-dan-internasional', [ProgramController::class, 'daftarKerjasama'])->name('daftar.kerjasama.nasional');
@@ -134,7 +141,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         
         // Import/Export
         Route::post('/upload', [ProgramController::class, 'upload'])->name('upload');
-        Route::get('/template', [ProgramController::class, 'template'])->name('template');
+        // Route template dipindahkan ke luar middleware admin (line ~59)
     });
 
     // ✅ Halaman Upload Excel program penelitian dan pengabdian
