@@ -340,15 +340,74 @@ public function updateKerjasama(Request $request, $id)
     public function template()
     {
         $templateDir = public_path('templates');
-        $files = glob($templateDir . '/*.xlsx');
+        $filePath = $templateDir . '/template_program.xlsx';
 
-        if (!empty($files)) {
-            $filePath = $files[0];
+        if (file_exists($filePath)) {
             return response()->download($filePath, 'Template_Program.xlsx');
         }
 
-        return redirect()->back()
-            ->with('error', 'File template tidak ditemukan. Pastikan ada di folder public/templates/');
+        // Jika template tidak ada, buat template sederhana
+        return $this->generateTemplateProgram();
+    }
+
+    private function generateTemplateProgram()
+    {
+        try {
+            $data = [
+                [
+                    'Tahun',
+                    'Kategori',
+                    'Skema',
+                    'Judul',
+                    'Ketua',
+                    'Anggota',
+                    'Dana'
+                ],
+                [
+                    '2024',
+                    'penelitian',
+                    'Penelitian Dasar',
+                    'Contoh Judul Penelitian 1',
+                    'Dr. Ahmad Suhardi',
+                    'Dr. Budi Santoso, M.Kom; Dr. Citra Dewi, M.T',
+                    '50000000'
+                ],
+                [
+                    '2024',
+                    'pengabdian',
+                    'Pengabdian Masyarakat',
+                    'Contoh Judul Pengabdian Masyarakat',
+                    'Prof. Dedi Rahmat',
+                    'Dr. Eko Prasetyo, M.Si; Dr. Fitri Handayani, M.Pd',
+                    '30000000'
+                ],
+            ];
+
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->fromArray($data, null, 'A1');
+
+            // Style header
+            $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+            $sheet->getStyle('A1:G1')->getFill()
+                ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                ->getStartColor()->setARGB('FF0891B2');
+            $sheet->getStyle('A1:G1')->getFont()->getColor()->setARGB('FFFFFFFF');
+
+            // Auto width
+            foreach (range('A', 'G') as $col) {
+                $sheet->getColumnDimension($col)->setAutoSize(true);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), 'template_program_');
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, 'Template_Program.xlsx')->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Gagal membuat template: ' . $e->getMessage());
+        }
     }
 
     /** ====================================================
