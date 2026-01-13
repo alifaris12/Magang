@@ -373,6 +373,17 @@
         <p class="subtitle">Upload file Excel untuk menambahkan data program</p>
       </div>
 
+      @if(session('success'))
+        <div style="background: rgba(34,197,94,0.1); color: #16a34a; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          ✔ {{ session('success') }}
+        </div>
+      @endif
+      @if(session('error'))
+        <div style="background: rgba(239,68,68,0.1); color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          ❌ {{ session('error') }}
+        </div>
+      @endif
+
       <!-- Download Template Button (centered) -->
       <div class="download-wrapper">
         <a href="{{ route('programs.template') }}" class="download-btn">
