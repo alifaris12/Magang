@@ -176,6 +176,40 @@
             background:linear-gradient(135deg,#1e40af,#2563eb);
             transform: translateY(-2px);
         }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(8,145,178,.1);
+            border: 2px dashed #0891b2;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .3s ease;
+            color: #0891b2;
+            font-weight: 600;
+        }
+        .file-label:hover {
+            background: rgba(8,145,178,.2);
+            border-color: #0e7490;
+        }
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
 
         /* Tablet Responsiveness */
         @media (max-width: 992px) {
@@ -388,14 +422,13 @@
 </head>
 <body>
     <div class="container">
-        <button class="back-button" onclick="goBack()" aria-label="Kembali">
+        <button class="back-button" onclick="goBack()">
             <span>←</span>
             <span>Kembali</span>
         </button>
 
-        <!-- Tombol Upload Excel di atas judul -->
         <div class="upload-excel-wrapper">
-            <a href="{{ route('upload.excel') }}" class="excel-btn" style="max-width:300px;">
+            <a href="{{ route('upload.excel') }}" class="excel-btn">
                 📁 Upload Program via Excel
             </a>
         </div>
@@ -405,8 +438,7 @@
             <p>Lengkapi formulir di bawah ini untuk menambahkan program penelitian atau pengabdian</p>
         </div>
 
-        {{-- Form input manual --}}
-        <form action="{{ route('programs.store') }}" method="POST" autocomplete="off">
+        <form action="{{ route('programs.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <div class="form-group">
                 <label for="tahun">Tahun</label>
@@ -443,11 +475,22 @@
                 <input type="text" id="dana" name="dana" placeholder="Masukkan dana yang diperlukan" inputmode="numeric" required>
             </div>
 
+            <div class="form-group">
+                <label for="file">Upload Dokumen (Opsional)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="updateFileName(this)">
+                    <label for="file" class="file-label">
+                        <span>📎</span>
+                        <span>Pilih File (PDF, DOC, XLS - Max 10MB)</span>
+                    </label>
+                </div>
+                <div class="file-name" id="fileName"></div>
+            </div>
+
             <button type="submit" class="submit-btn">Tambah Program</button>
         </form>
     </div>
 
-    <!-- Toast Notification -->
     @if(session('success'))
     <div id="toast" class="toast">
         ✔ Program berhasil ditambahkan! <br>
@@ -456,27 +499,25 @@
     @endif
 
     <script>
-        // Back button functionality
         function goBack() {
-            if (window.history.length > 1) {
-                window.history.back();
-            } else {
-                window.location.href = '/';
-            }
+            window.history.length > 1 ? window.history.back() : window.location.href = '/';
         }
 
-        // Format ribuan untuk input Dana
-        document.getElementById('dana')?.addEventListener('input', function(event) {
-            const value = event.target.value.replace(/\D/g, '');
-            event.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        document.getElementById('dana')?.addEventListener('input', function(e) {
+            const value = e.target.value.replace(/\D/g, '');
+            e.target.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
         });
 
-        // Toast Animation
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? `File dipilih: ${fileName}` : '';
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             const toast = document.getElementById('toast');
             if (toast) {
-                setTimeout(() => { toast.classList.add('show'); }, 200);
-                setTimeout(() => { toast.classList.remove('show'); }, 4000);
+                setTimeout(() => toast.classList.add('show'), 200);
+                setTimeout(() => toast.classList.remove('show'), 4000);
             }
         });
     </script>

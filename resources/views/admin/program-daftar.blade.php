@@ -679,7 +679,7 @@
             <h1>Daftar Program Penelitian dan Pengabdian</h1>
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
                 <button onclick="history.back()" class="back-btn">⬅ Back</button>
-                <a href="#" class="tambah-btn">+ Tambah Program</a>
+                <a href="{{ route('input.program') }}" class="tambah-btn">+ Tambah Program</a>
             </div>
         </div>
 
@@ -793,6 +793,7 @@
                         <th>Ketua</th>
                         <th>Dana</th>
                         <th>Anggota</th>
+                        <th>File</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
@@ -807,15 +808,28 @@
                             <td>{{ $program->ketua }}</td>
                             <td style="color:#059669;font-weight:600;">Rp {{ number_format($program->dana, 0, ',', '.') }}</td>
                             <td>{{ $program->anggota ?? '-' }}</td>
+                            <td style="text-align:center;">
+                                @if($program->file_path)
+                                    <a href="{{ Storage::url($program->file_path) }}" target="_blank" class="action-btn btn-view" title="Lihat File">
+                                        📄
+                                    </a>
+                                @else
+                                    <span style="color:#94a3b8;">-</span>
+                                @endif
+                            </td>
                             <td>
                                 <button onclick='openModal(@json($program))' class="action-btn btn-view">👁</button>
-                                <button onclick='editProgram({{ $program->id }})' class="action-btn btn-edit">✏️</button>
-                                <button onclick="deleteProgram({{ $program->id }})" class="action-btn btn-delete">🗑️</button>
+                                <a href="{{ route('programs.edit', $program->id) }}" class="action-btn btn-edit">✏️</a>
+                                <form action="{{ route('programs.destroy', $program->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Yakin ingin menghapus program ini? File terkait juga akan dihapus.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="action-btn btn-delete">🗑️</button>
+                                </form>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="empty-state">
+                            <td colspan="10" class="empty-state">
                                 <h3>📋 Belum Ada Program</h3>
                                 <p>Belum ada program penelitian atau pengabdian yang terdaftar.</p>
                             </td>

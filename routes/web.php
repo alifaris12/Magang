@@ -90,8 +90,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/{program}', [ProgramController::class, 'destroyPenelitian'])->name('program-penelitian.destroy');
         Route::view('/program/input', 'admin.program-input')->name('input.program');
         Route::get('/program-daftar', [ProgramController::class, 'index'])->name('daftar.program');
-
     });
+    Route::post('/programs', [ProgramController::class, 'store'])->name('programs.store');
+    Route::get('/programs/{id}/edit', [ProgramController::class, 'edit'])->name('programs.edit');
+    Route::put('/programs/{id}', [ProgramController::class, 'updateProgram'])->name('programs.update');
+    Route::delete('/programs/{id}', [ProgramController::class, 'destroy'])->name('programs.destroy');
 
     Route::prefix('program-pengabdian')->group(function () {
         Route::get('/', [ProgramController::class, 'indexPengabdian'])->name('program-pengabdian.index');

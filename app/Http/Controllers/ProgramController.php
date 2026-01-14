@@ -7,6 +7,7 @@ use App\Models\ProgramKerjasama;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProgramImport;
@@ -18,63 +19,171 @@ class ProgramController extends Controller
      * INDEX: Daftar Program Penelitian & Pengabdian
      * ==================================================== */
     public function index(Request $request)
-        {
-            $query = Program::query();
+    {
+        $query = Program::query();
 
-            // Filter skema
-            if ($request->filled('skema')) {
-                $query->where('skema', $request->skema);
-            }
-
-            // Filter tahun
-            if ($request->filled('tahun')) {
-                $query->where('tahun', $request->tahun);
-            }
-
-            // Filter pencarian
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->where(function ($q) use ($search) {
-                    $q->where('judul', 'like', "%{$search}%")
-                        ->orWhere('ketua', 'like', "%{$search}%")
-                        ->orWhere('anggota', 'like', "%{$search}%");
-                });
-            }
-
-            // Urutan default by created_at
-            $table = (new Program)->getTable();
-            $sortCol = Schema::hasColumn($table, 'created_at') ? 'created_at' : 'id';
-
-            // Filter jumlah item per halaman
-            $perPage = $request->filled('per_page') ? (int) $request->per_page : 500;
-            $perPage = in_array($perPage, [10, 25, 50, 100, 200, 500]) ? $perPage : 500;
-
-            $programs = $query->orderByDesc($sortCol)->paginate($perPage)->withQueryString();
-
-            // Data unik untuk filter dropdown
-            $skemas = Program::select('skema')->distinct()->pluck('skema');
-            $tahuns = Program::select('tahun')->distinct()->orderByDesc('tahun')->pluck('tahun');
-
-            // Data untuk chart: Filter berdasarkan tahun yang dipilih (kumulatif sampai tahun tersebut)
-            $chartYearFilter = $request->filled('chart_tahun') ? $request->chart_tahun : null;
-            
-            $chartQuery = Program::query();
-            if ($chartYearFilter) {
-                // Ambil data sampai tahun yang dipilih
-                $chartQuery->where('tahun', '<=', $chartYearFilter);
-            }
-            
-            // Grouping berdasarkan skema
-            $chartData = $chartQuery->selectRaw('skema, SUM(dana) as total_dana')
-                ->groupBy('skema')
-                ->orderBy('total_dana', 'desc')
-                ->get();
-
-            $view = (Auth::check() && Auth::user()->role === 'user') ? 'user.program-daftar' : 'admin.program-daftar';
-
-            return view($view, compact('programs', 'skemas', 'tahuns', 'chartData', 'chartYearFilter'));
+        if ($request->filled('skema')) {
+            $query->where('skema', $request->skema);
         }
 
+        if ($request->filled('tahun')) {
+            $query->where('tahun', $request->tahun);
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('judul', 'like', "%{$search}%")
+                    ->orWhere('ketua', 'like', "%{$search}%")
+                    ->orWhere('anggota', 'like', "%{$search}%");
+            });
+        }
+
+        $table = (new Program)->getTable();
+        $sortCol = Schema::hasColumn($table, 'created_at') ? 'created_at' : 'id';
+
+        $perPage = $request->filled('per_page') ? (int) $request->per_page : 500;
+        $perPage = in_array($perPage, [10, 25, 50, 100, 200, 500]) ? $perPage : 500;
+
+        $programs = $query->orderByDesc($sortCol)->paginate($perPage)->withQueryString();
+
+        $skemas = Program::select('skema')->distinct()->pluck('skema');
+        $tahuns = Program::select('tahun')->distinct()->orderByDesc('tahun')->pluck('tahun');
+
+        $chartYearFilter = $request->filled('chart_tahun') ? $request->chart_tahun : null;
+        
+        $chartQuery = Program::query();
+        if ($chartYearFilter) {
+            $chartQuery->where('tahun', '<=', $chartYearFilter);
+        }
+        
+        $chartData = $chartQuery->selectRaw('skema, SUM(dana) as total_dana')
+            ->groupBy('skema')
+            ->orderBy('total_dana', 'desc')
+            ->get();
+
+        $view = (Auth::check() && Auth::user()->role === 'user') ? 'user.program-daftar' : 'admin.program-daftar';
+
+        return view($view, compact('programs', 'skemas', 'tahuns', 'chartData', 'chartYearFilter'));
+    }
+
+    /** ====================================================
+     * STORE: Simpan Program Baru
+     * ==================================================== */
+    public function store(Request $request)
+    {
+        $kategori = strtolower($request->input('kategori', 'penelitian'));
+
+        if ($kategori === 'kerjasama') {
+            $validated = $request->validate([
+                'mitra_kerjasama' => 'required|string|max:200',
+                'tahun'           => 'required|digits:4',
+                'jangka_waktu'    => 'required|string|max:100',
+                'tanggal_mulai'   => 'required|date',
+                'tanggal_selesai' => 'required|date',
+                'tingkat'         => 'required|in:nasional,internasional',
+            ]);
+
+            ProgramKerjasama::create($validated);
+
+            return redirect()->route('daftar.kerjasama.nasional')
+                ->with('success', 'Program Kerjasama berhasil ditambahkan.');
+        }
+
+        $validated = $request->validate([
+            'tahun'    => 'required|digits:4',
+            'kategori' => 'required|string|max:100',
+            'skema'    => 'required|string|max:100',
+            'judul'    => 'required|string|max:255',
+            'ketua'    => 'required|string|max:100',
+            'anggota'  => 'nullable|string|max:255',
+            'dana'     => 'required',
+            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+        ]);
+
+        $validated['dana'] = (int) preg_replace('/\D/', '', $request->input('dana'));
+
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('program_files', $fileName, 'public');
+            $validated['file_path'] = $filePath;
+        }
+
+        Program::create($validated);
+
+        return redirect()->route('daftar.program')
+            ->with('success', 'Program berhasil ditambahkan.');
+    }
+
+    /** ====================================================
+     * EDIT: Tampilkan Form Edit Program
+     * ==================================================== */
+    public function edit($id)
+    {
+        $program = Program::findOrFail($id);
+        return view('admin.program-edit', compact('program'));
+    }
+
+    /** ====================================================
+     * UPDATE: Update Program
+     * ==================================================== */
+    public function updateProgram(Request $request, $id)
+    {
+        $program = Program::findOrFail($id);
+
+        $validated = $request->validate([
+            'tahun'    => 'required|digits:4',
+            'kategori' => 'required|string|max:100',
+            'skema'    => 'required|string|max:100',
+            'judul'    => 'required|string|max:255',
+            'ketua'    => 'required|string|max:100',
+            'anggota'  => 'nullable|string|max:255',
+            'dana'     => 'required',
+            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+        ]);
+
+        $validated['dana'] = (int) preg_replace('/\D/', '', $request->input('dana'));
+
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            // Delete old file if exists
+            if ($program->file_path && Storage::disk('public')->exists($program->file_path)) {
+                Storage::disk('public')->delete($program->file_path);
+            }
+
+            // Upload new file
+            $file = $request->file('file');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $filePath = $file->storeAs('program_files', $fileName, 'public');
+            $validated['file_path'] = $filePath;
+        }
+
+        $program->update($validated);
+
+        return redirect()->route('daftar.program')
+            ->with('success', 'Program berhasil diperbarui.');
+    }
+
+    /** ====================================================
+     * DESTROY: Hapus Program
+     * ==================================================== */
+    public function destroy($id)
+    {
+        $program = Program::findOrFail($id);
+        
+        // Delete file if exists (akan otomatis terpanggil dari boot method)
+        // Tapi kita bisa panggil manual juga untuk memastikan
+        if ($program->file_path && Storage::disk('public')->exists($program->file_path)) {
+            Storage::disk('public')->delete($program->file_path);
+        }
+        
+        $program->delete();
+
+        return redirect()->route('daftar.program')
+            ->with('success', 'Program berhasil dihapus.');
+    }
     /** ====================================================
      * INDEX PROGRAM PENELITIAN
      * ==================================================== */
@@ -105,54 +214,6 @@ class ProgramController extends Controller
         $programs = $query->orderByDesc('created_at')->paginate(50);
 
         return view('admin.program-penelitian', compact('programs'));
-    }
-
-    /** ====================================================
-     * STORE: Simpan Program Baru
-     * ==================================================== */
-    public function store(Request $request)
-    {
-        $kategori = strtolower($request->input('kategori', 'penelitian'));
-
-        /* =====================================================
-         * 1️⃣ INPUT KERJASAMA → simpan ke tabel program_kerjasama
-         * ===================================================== */
-        if ($kategori === 'kerjasama') {
-            $validated = $request->validate([
-                'mitra_kerjasama' => 'required|string|max:200',
-                'tahun'           => 'required|digits:4',
-                'jangka_waktu'    => 'required|string|max:100',
-                'tanggal_mulai'   => 'required|date',
-                'tanggal_selesai' => 'required|date',
-                'tingkat'         => 'required|in:nasional,internasional',
-            ]);
-
-            ProgramKerjasama::create($validated);
-
-            return redirect()->route('daftar.kerjasama.nasional')
-                ->with('success', 'Program Kerjasama berhasil ditambahkan.');
-        }
-
-        /* =====================================================
-         * 2️⃣ INPUT PENELITIAN / PENGABDIAN → ke tabel programs
-         * ===================================================== */
-        $validated = $request->validate([
-            'tahun'    => 'required|digits:4',
-            'kategori' => 'required|string|max:100',
-            'skema'    => 'required|string|max:100',
-            'judul'    => 'required|string|max:255',
-            'ketua'    => 'required|string|max:100',
-            'anggota'  => 'nullable|string|max:255',
-            'dana'     => 'required',
-        ]);
-
-        // Pastikan nilai dana hanya angka
-        $validated['dana'] = (int) preg_replace('/\D/', '', $request->input('dana'));
-
-        Program::create($validated);
-
-        return redirect()->route('daftar.program')
-            ->with('success', 'Program berhasil ditambahkan.');
     }
 
     /** ====================================================
@@ -443,19 +504,6 @@ public function updateKerjasama(Request $request, $id)
         return redirect()
             ->route('daftar.kerjasama.nasional')
             ->with('success', 'Program Kerjasama berhasil dihapus.');
-    }
-
-    /** ====================================================
-     * DESTROY: Hapus Program (Penelitian/Pengabdian)
-     * ==================================================== */
-    public function destroy($id)
-    {
-        $program = Program::findOrFail($id);
-        $program->delete();
-
-        return redirect()
-            ->route('daftar.program')
-            ->with('success', 'Program berhasil dihapus.');
     }
 
     /** ====================================================
