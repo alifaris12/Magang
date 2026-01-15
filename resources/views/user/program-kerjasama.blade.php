@@ -780,6 +780,7 @@
                                     <th>Tanggal Mulai</th>
                                     <th>Tanggal Selesai</th>
                                     <th>Tingkat</th>
+                                    <th>File</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -793,6 +794,15 @@
                         <td>{{ \Carbon\Carbon::parse($program->tanggal_mulai)->format('d-m-Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($program->tanggal_selesai)->format('d-m-Y') }}</td>
                         <td>{{ ucfirst($program->tingkat) }}</td>
+                        <td style="text-align:center;">
+                            @if($program->file_path)
+                                <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank" class="action-btn btn-view" title="Lihat File">
+                                    📄
+                                </a>
+                            @else
+                                <span style="color:#94a3b8;">-</span>
+                            @endif
+                        </td>
                         <td>
                             <a href="javascript:void(0)" data-program='@json($program)'
                                onclick="openModal(this)" class="action-btn btn-view">👁</a>
@@ -971,13 +981,23 @@
             const program = JSON.parse(element.getAttribute('data-program'));
             const tanggalMulai = new Date(program.tanggal_mulai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
             const tanggalSelesai = new Date(program.tanggal_selesai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
+            
+            let fileDisplay = '';
+            if (program.file_path) {
+                const fileName = program.file_path.split('/').pop();
+                fileDisplay = `<p><b>File:</b> <a href="/storage/${program.file_path}" target="_blank" style="color:#0891b2;text-decoration:underline;">📄 ${fileName}</a></p>`;
+            } else {
+                fileDisplay = '<p><b>File:</b> <span style="color:#94a3b8;">Tidak ada file</span></p>';
+            }
+            
             let body = `
                 <p><b>Mitra Kerjasama:</b> ${program.mitra_kerjasama}</p>
                 <p><b>Tahun:</b> ${program.tahun}</p>
                 <p><b>Jangka Waktu:</b> ${program.jangka_waktu}</p>
                 <p><b>Tanggal Mulai:</b> ${tanggalMulai}</p>
                 <p><b>Tanggal Selesai:</b> ${tanggalSelesai}</p>
-                <p><b>Tingkat:</b> ${program.tingkat.charAt(0).toUpperCase() + program.tingkat.slice(1)}</p>`;
+                <p><b>Tingkat:</b> ${program.tingkat.charAt(0).toUpperCase() + program.tingkat.slice(1)}</p>
+                ${fileDisplay}`;
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('programModal').style.display = 'flex';
         }
