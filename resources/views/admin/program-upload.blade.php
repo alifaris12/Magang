@@ -383,6 +383,21 @@
           ❌ {{ session('error') }}
         </div>
       @endif
+      @if(session('warning'))
+        <div style="background: rgba(251,146,60,0.1); color: #ea580c; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          ⚠️ {{ session('warning') }}
+        </div>
+      @endif
+      @if($errors->any())
+        <div style="background: rgba(239,68,68,0.1); color: #dc2626; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-weight: 500;">
+          <strong>❌ Terjadi kesalahan:</strong>
+          <ul style="margin: 10px 0 0 0; padding-left: 20px;">
+            @foreach($errors->all() as $error)
+              <li>{{ $error }}</li>
+            @endforeach
+          </ul>
+        </div>
+      @endif
 
       <!-- Download Template Button (centered) -->
       <div class="download-wrapper">

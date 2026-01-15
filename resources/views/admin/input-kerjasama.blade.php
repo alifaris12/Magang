@@ -49,7 +49,6 @@
         .toast {
             position: fixed;
             top: 20px; right: 20px;
-            background: #22c55e;
             color: #fff;
             padding: 16px 24px;
             border-radius: 8px;
@@ -59,7 +58,10 @@
             transform: translateY(-20px);
             transition: all 0.5s ease;
             z-index: 9999;
+            max-width: 350px;
         }
+        .toast-success { background: #22c55e; }
+        .toast-error { background: #ef4444; }
         .toast.show { opacity: 1; transform: translateY(0); }
         .upload-excel-wrapper { text-align:center; margin-bottom:20px; }
         .excel-btn {
@@ -129,19 +131,55 @@
         </form>
     </div>
 
+    {{-- Success Message --}}
     @if(session('success'))
-    <div id="toast" class="toast">
+    <div id="toast" class="toast toast-success">
         ✔ Program berhasil ditambahkan! <br>
         {{ session('success') }}
     </div>
     @endif
 
+    {{-- Error Message --}}
+    @if(session('error'))
+    <div id="toast-error" class="toast toast-error">
+        ❌ Gagal menambahkan program! <br>
+        {{ session('error') }}
+    </div>
+    @endif
+
+    {{-- Validation Errors --}}
+    @if($errors->any())
+    <div id="toast-validation" class="toast toast-error">
+        <strong>❌ Terjadi kesalahan:</strong>
+        <ul style="margin: 10px 0 0 0; padding-left: 20px; text-align: left;">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+    @endif
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Success Toast
             const toast = document.getElementById('toast');
             if (toast) {
                 setTimeout(() => { toast.classList.add('show'); }, 200);
                 setTimeout(() => { toast.classList.remove('show'); }, 4000);
+            }
+
+            // Error Toast
+            const toastError = document.getElementById('toast-error');
+            if (toastError) {
+                setTimeout(() => toastError.classList.add('show'), 200);
+                setTimeout(() => toastError.classList.remove('show'), 5000);
+            }
+
+            // Validation Error Toast
+            const toastValidation = document.getElementById('toast-validation');
+            if (toastValidation) {
+                setTimeout(() => toastValidation.classList.add('show'), 200);
+                setTimeout(() => toastValidation.classList.remove('show'), 6000);
             }
         });
     </script>
