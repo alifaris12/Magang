@@ -71,17 +71,19 @@ class ProgramController extends Controller
      * STORE: Simpan Program Baru
      * ==================================================== */
     public function store(Request $request)
-    {
+    { 
         $kategori = strtolower($request->input('kategori', 'penelitian'));
 
         if ($kategori === 'kerjasama') {
             $validated = $request->validate([
-                'mitra_kerjasama' => 'required|string|max:200',
+                'mitra_kerjasama' => 'required|string|max:200|unique:program_kerjasama,mitra_kerjasama',
                 'tahun'           => 'required|digits:4',
                 'jangka_waktu'    => 'required|string|max:100',
                 'tanggal_mulai'   => 'required|date',
                 'tanggal_selesai' => 'required|date',
                 'tingkat'         => 'required|in:nasional,internasional',
+            ], [
+                'mitra_kerjasama.unique' => 'Nama mitra kerjasama sudah pernah diinput sebelumnya.',
             ]);
 
             ProgramKerjasama::create($validated);
@@ -94,11 +96,14 @@ class ProgramController extends Controller
             'tahun'    => 'required|digits:4',
             'kategori' => 'required|string|max:100',
             'skema'    => 'required|string|max:100',
-            'judul'    => 'required|string|max:255',
+            'judul'    => 'required|string|max:255|unique:programs,judul',
             'ketua'    => 'required|string|max:100',
             'anggota'  => 'nullable|string|max:255',
             'dana'     => 'required',
-            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120',
+        ], [
+            'judul.unique' => 'Judul program sudah pernah diinput sebelumnya.',
+            'file.max' => 'Ukuran file maksimal 5MB.',
         ]);
 
         $validated['dana'] = (int) preg_replace('/\D/', '', $request->input('dana'));
@@ -137,11 +142,14 @@ class ProgramController extends Controller
             'tahun'    => 'required|digits:4',
             'kategori' => 'required|string|max:100',
             'skema'    => 'required|string|max:100',
-            'judul'    => 'required|string|max:255',
+            'judul'    => 'required|string|max:255|unique:programs,judul,' . $id,
             'ketua'    => 'required|string|max:100',
             'anggota'  => 'nullable|string|max:255',
             'dana'     => 'required',
-            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+            'file'     => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120',
+        ], [
+            'judul.unique' => 'Judul program sudah pernah diinput sebelumnya.',
+            'file.max' => 'Ukuran file maksimal 5MB.',
         ]);
 
         $validated['dana'] = (int) preg_replace('/\D/', '', $request->input('dana'));
@@ -377,7 +385,17 @@ public function updateKerjasama(Request $request, $id)
         ]);
 
         try {
-            Excel::import(new ProgramImport, $request->file('file'));
+            $import = new ProgramImport;
+            Excel::import($import, $request->file('file'));
+            
+            $skippedCount = count($import->failures());
+            
+            if ($skippedCount > 0) {
+                return redirect()->route('daftar.program')
+                    ->with('success', 'Data program berhasil diupload.')
+                    ->with('warning', "Catatan: {$skippedCount} baris dilewati karena judul sudah ada di database.");
+            }
+            
             return redirect()->route('daftar.program')
                 ->with('success', 'Data program berhasil diupload.');
         } catch (\Throwable $e) {
@@ -524,7 +542,17 @@ public function updateKerjasama(Request $request, $id)
         ]);
 
         try {
-            Excel::import(new ProgramKerjasamaImport, $request->file('file'));
+            $import = new ProgramKerjasamaImport;
+            Excel::import($import, $request->file('file'));
+            
+            $skippedCount = count($import->failures());
+            
+            if ($skippedCount > 0) {
+                return redirect()->route('daftar.kerjasama.nasional')
+                    ->with('success', 'Data program kerjasama berhasil diupload.')
+                    ->with('warning', "Catatan: {$skippedCount} baris dilewati karena nama mitra sudah ada di database.");
+            }
+            
             return redirect()->route('daftar.kerjasama.nasional')
                 ->with('success', 'Data program kerjasama berhasil diupload.');
         } catch (\Throwable $e) {
