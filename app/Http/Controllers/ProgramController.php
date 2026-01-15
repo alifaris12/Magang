@@ -82,9 +82,19 @@ class ProgramController extends Controller
                 'tanggal_mulai'   => 'required|date',
                 'tanggal_selesai' => 'required|date',
                 'tingkat'         => 'required|in:nasional,internasional',
+                'file'            => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx|max:5120',
             ], [
                 'mitra_kerjasama.unique' => 'Nama mitra kerjasama sudah pernah diinput sebelumnya.',
+                'file.max' => 'Ukuran file maksimal 5MB.',
             ]);
+
+            // Handle file upload
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $filePath = $file->storeAs('kerjasama_files', $fileName, 'public');
+                $validated['file_path'] = $filePath;
+            }
 
             ProgramKerjasama::create($validated);
 
