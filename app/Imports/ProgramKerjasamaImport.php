@@ -5,14 +5,28 @@ namespace App\Imports;
 use App\Models\ProgramKerjasama;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
+use Maatwebsite\Excel\Concerns\SkipsOnError;
+use Maatwebsite\Excel\Concerns\SkipsErrors;
+use Maatwebsite\Excel\Concerns\SkipsOnFailure;
+use Maatwebsite\Excel\Concerns\SkipsFailures;
+use Maatwebsite\Excel\Concerns\Importable;
 use Carbon\Carbon;
 
-class ProgramKerjasamaImport implements ToModel, WithHeadingRow
+class ProgramKerjasamaImport implements ToModel, WithHeadingRow, SkipsOnError, SkipsOnFailure
 {
+    use Importable, SkipsErrors, SkipsFailures;
+
     public function model(array $row)
     {
 
         $mitra = $this->getValue($row, ['mitra_kerjasama', 'Mitra Kerjasama', 'MITRA_KERJASAMA', 'mitra', 'Mitra', 'MITRA']);
+        
+        // Cek apakah nama mitra sudah ada di database
+        if ($mitra && ProgramKerjasama::where('mitra_kerjasama', $mitra)->exists()) {
+            // Skip row ini jika mitra sudah ada
+            return null;
+        }
+
         $tahun = $this->getValue($row, ['tahun', 'Tahun', 'TAHUN']);
         $jangkaWaktu = $this->getValue($row, ['jangka_waktu', 'Jangka Waktu', 'JANGKA_WAKTU', 'jangka', 'Jangka', 'JANGKA']);
         $tanggalMulai = $this->getValue($row, ['tanggal_mulai', 'Tanggal Mulai', 'TANGGAL_MULAI', 'mulai', 'Mulai', 'MULAI']);
