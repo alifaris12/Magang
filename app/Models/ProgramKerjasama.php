@@ -21,7 +21,7 @@ class ProgramKerjasama extends Model
         'jangka_waktu',
         'tanggal_mulai',
         'tanggal_selesai',
-        
+        'file_path',
     ];
 
     // Tentukan kolom yang tidak bisa diisi (guarded), jika perlu
