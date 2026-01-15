@@ -73,6 +73,40 @@
             box-shadow:0 4px 8px rgba(37,99,235,.3);
         }
         .excel-btn:hover { background:linear-gradient(135deg,#1e40af,#2563eb); }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(8,145,178,.1);
+            border: 2px dashed #0891b2;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all .3s ease;
+            color: #0891b2;
+            font-weight: 600;
+        }
+        .file-label:hover {
+            background: rgba(8,145,178,.2);
+            border-color: #0e7490;
+        }
+        .file-name {
+            margin-top: 8px;
+            font-size: 14px;
+            color: #666;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
@@ -90,7 +124,7 @@
             <p>Lengkapi formulir berikut untuk menambahkan data kerjasama</p>
         </div>
 
-        <form action="{{ route('programs.store') }}" method="POST" autocomplete="off">
+        <form action="{{ route('programs.store') }}" method="POST" enctype="multipart/form-data" autocomplete="off">
             @csrf
             <input type="hidden" name="kategori" value="kerjasama">
 
@@ -127,6 +161,18 @@
                 <input type="date" id="tanggal_selesai" name="tanggal_selesai" required>
             </div>
 
+            <div class="form-group">
+                <label for="file">Upload Dokumen (Opsional)</label>
+                <div class="file-input-wrapper">
+                    <input type="file" id="file" name="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onchange="updateFileName(this)">
+                    <label for="file" class="file-label">
+                        <span>📎</span>
+                        <span>Pilih File (PDF, DOC, XLS - Max 5MB)</span>
+                    </label>
+                </div>
+                <div class="file-name" id="fileName"></div>
+            </div>
+
             <button type="submit" class="submit-btn">Tambah Kerjasama</button>
         </form>
     </div>
@@ -160,6 +206,11 @@
     @endif
 
     <script>
+        function updateFileName(input) {
+            const fileName = input.files[0]?.name || '';
+            document.getElementById('fileName').textContent = fileName ? `File dipilih: ${fileName}` : '';
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             // Success Toast
             const toast = document.getElementById('toast');

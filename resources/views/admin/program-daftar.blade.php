@@ -810,7 +810,7 @@
                             <td>{{ $program->anggota ?? '-' }}</td>
                             <td style="text-align:center;">
                                 @if($program->file_path)
-                                    <a href="{{ Storage::url($program->file_path) }}" target="_blank" class="action-btn btn-view" title="Lihat File">
+                                    <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank" class="action-btn btn-view" title="Lihat File">
                                         📄
                                     </a>
                                 @else

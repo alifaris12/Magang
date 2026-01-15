@@ -803,6 +803,7 @@
                                     <th>Tanggal Mulai</th>
                                     <th>Tanggal Selesai</th>
                                     <th>Tingkat</th>
+                                    <th>File</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -816,6 +817,15 @@
                         <td>{{ \Carbon\Carbon::parse($program->tanggal_mulai)->format('d-m-Y') }}</td>
                         <td>{{ \Carbon\Carbon::parse($program->tanggal_selesai)->format('d-m-Y') }}</td>
                         <td>{{ ucfirst($program->tingkat) }}</td>
+                        <td style="text-align:center;">
+                            @if($program->file_path)
+                                <a href="{{ asset('storage/' . $program->file_path) }}" target="_blank" class="action-btn btn-view" title="Lihat File">
+                                    📄
+                                </a>
+                            @else
+                                <span style="color:#94a3b8;">-</span>
+                            @endif
+                        </td>
                         <td>
                             <a href="javascript:void(0)" data-program='@json($program)'
                                onclick="openModal(this)" class="action-btn btn-view">👁</a>
@@ -870,7 +880,7 @@
                 <h2>Edit Program Kerjasama</h2>
                 <button class="close-btn" onclick="closeEditModal()">×</button>
             </div>
-            <form id="editForm" method="POST">
+            <form id="editForm" method="POST" enctype="multipart/form-data">
                 @csrf @method('PUT')
                 <div class="filter-group">
                     <label>Mitra Kerjasama</label>
@@ -898,6 +908,12 @@
                         <option value="nasional">Nasional</option>
                         <option value="internasional">Internasional</option>
                     </select>
+                </div>
+                <div class="filter-group">
+                    <label>Upload File Baru (Opsional)</label>
+                    <input type="file" name="file" id="editFile" class="filter-input" accept=".pdf,.doc,.docx,.xls,.xlsx">
+                    <small style="color:#6b7280;font-size:12px;">Maksimal 5MB - Format: PDF, DOC, DOCX, XLS, XLSX</small>
+                    <div id="currentFileName" style="margin-top:8px;font-size:14px;color:#059669;"></div>
                 </div>
                 <div style="margin-top:15px; text-align:right;">
                     <button type="button" class="search-btn" onclick="closeEditModal()">Batal</button>
@@ -1047,13 +1063,23 @@
             const program = JSON.parse(element.getAttribute('data-program'));
             const tanggalMulai = new Date(program.tanggal_mulai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
             const tanggalSelesai = new Date(program.tanggal_selesai).toLocaleDateString('id-ID', {day: '2-digit', month: '2-digit', year: 'numeric'});
+            
+            let fileDisplay = '';
+            if (program.file_path) {
+                const fileName = program.file_path.split('/').pop();
+                fileDisplay = `<p><b>File:</b> <a href="/storage/${program.file_path}" target="_blank" style="color:#0891b2;text-decoration:underline;">📄 ${fileName}</a></p>`;
+            } else {
+                fileDisplay = '<p><b>File:</b> <span style="color:#94a3b8;">Tidak ada file</span></p>';
+            }
+            
             let body = `
                 <p><b>Mitra Kerjasama:</b> ${program.mitra_kerjasama}</p>
                 <p><b>Tahun:</b> ${program.tahun}</p>
                 <p><b>Jangka Waktu:</b> ${program.jangka_waktu}</p>
                 <p><b>Tanggal Mulai:</b> ${tanggalMulai}</p>
                 <p><b>Tanggal Selesai:</b> ${tanggalSelesai}</p>
-                <p><b>Tingkat:</b> ${program.tingkat.charAt(0).toUpperCase() + program.tingkat.slice(1)}</p>`;
+                <p><b>Tingkat:</b> ${program.tingkat.charAt(0).toUpperCase() + program.tingkat.slice(1)}</p>
+                ${fileDisplay}`;
             document.getElementById('modalBody').innerHTML = body;
             document.getElementById('programModal').style.display = 'flex';
         }
@@ -1069,6 +1095,16 @@
             document.getElementById('editTanggalMulai').value = program.tanggal_mulai.split(' ')[0];
             document.getElementById('editTanggalSelesai').value = program.tanggal_selesai.split(' ')[0];
             document.getElementById('editTingkat').value = program.tingkat;
+            
+            // Display current file name if exists
+            const currentFileDiv = document.getElementById('currentFileName');
+            if (program.file_path) {
+                const fileName = program.file_path.split('/').pop();
+                currentFileDiv.innerHTML = `File saat ini: <a href="/storage/${program.file_path}" target="_blank" style="color:#0891b2;text-decoration:underline;">📄 ${fileName}</a>`;
+            } else {
+                currentFileDiv.innerHTML = 'Belum ada file';
+            }
+            
             document.getElementById('editModal').style.display = 'flex';
         }
 
