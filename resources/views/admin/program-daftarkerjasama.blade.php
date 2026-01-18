@@ -32,6 +32,11 @@
         </tbody>
     </table>
 
-    {{ $programs->links() }}
+    <div class="pagination-wrapper" style="margin-top: 30px; display: flex; flex-direction: column; align-items: center; gap: 15px;">
+        <span style="color: #6b7280; font-size: 14px; font-weight: 500; text-align: center;">
+            Menampilkan {{ $programs->firstItem() }} sampai {{ $programs->lastItem() }} dari {{ $programs->total() }} hasil
+        </span>
+        {{ $programs->links('vendor.pagination.custom') }}
+    </div>
 </div>
 @endsection

@@ -651,6 +651,21 @@
             .chart-container { height: 200px; }
             .stat-value { font-size: 14px; }
         }
+
+        /* Pagination Styles */
+        .pagination-wrapper {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .pagination-info {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -826,7 +841,7 @@
                 <span class="pagination-info">
                     Menampilkan {{ $programKerjasama->firstItem() }} sampai {{ $programKerjasama->lastItem() }} dari {{ $programKerjasama->total() }} hasil
                 </span>
-                {{ $programKerjasama->links() }}
+                {{ $programKerjasama->links('vendor.pagination.custom') }}
             </div>
         @endif
     </div>
